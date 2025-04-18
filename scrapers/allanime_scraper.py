@@ -112,7 +112,7 @@ class AllAnimeScraper:
     PAGE_SIZE = 26
 
     # GraphQL Query Constants (Copied carefully, ensure formatting is exact)
-    SEARCH_QUERY = "query ($search: SearchInput, $limit: Int, $page: Int, $translationType: VaildTranslationType, $countryOrigin: Country) { shows(search: $search, limit: $limit, page: $page, translationType: $translationType, countryOrigin: $countryOrigin) { edges { _id name englishName nativeName thumbnail slugTime type season score availableEpisodesDetail } } }"
+    SEARCH_QUERY = "query ($search: SearchInput, $limit: Int, $page: Int, $translationType: VaildTranslationTypeEnumType, $countryOrigin: String) { shows(search: $search, limit: $limit, page: $page, translationType: $translationType, countryOrigin: $countryOrigin) { edges { _id name englishName nativeName thumbnail slugTime type season score availableEpisodesDetail } } }"
 # Note: Added more fields to SEARCH_QUERY based on parseAnime usage
 
     DETAILS_QUERY = "query ($_id: String!) { show(_id: $_id) { _id name englishName nativeName thumbnail description genres studios season { quarter year } status score type availableEpisodesDetail { sub dub } } }"
@@ -120,7 +120,7 @@ class AllAnimeScraper:
 
     EPISODES_QUERY = "query ($_id: String!) { show(_id: $_id) { _id availableEpisodesDetail { sub dub } } }"
 
-    STREAMS_QUERY = "query ($showId: String!, $translationType: VaildTranslationType!, $episodeString: String!) { episode(showId: $showId, translationType: $translationType, episodeString: $episodeString) { sourceUrls } }"
+    STREAMS_QUERY = "query ($showId: String!, $translationType: VaildTranslationTypeEnumType!, $episodeString: String!) { episode(showId: $showId, translationType: $translationType, episodeString: $episodeString) { sourceUrls } }"
 # Note: Simplified STREAMS_QUERY based on Kotlin usage (sourceUrls is the primary need)
 
     # Hoster Names (from Kotlin companion object)
