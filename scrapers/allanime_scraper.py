@@ -313,8 +313,9 @@ class AllAnimeScraper:
 
             if response.status_code == 400:
                  print(f"❌ AllAnime search failed (400 Bad Request). Payload: {json.dumps(data)}")
-                 with open("error.txt", "w") as n: n.write(str(data))
-                 print(f"Response Text: {response.text[:500]}") # Print beginning of error response
+                 with open("error.txt", "w") as n: n.write("Payload: " + str(data)); n.write("\nRespone Text:" + str(response.text))
+                 print(f"Response Text: {response.text[:500]}")
+                 #n.write(str(response.text)) # Print beginning of error response
                  return []
             response.raise_for_status() # Raise an exception for other bad status codes
 
