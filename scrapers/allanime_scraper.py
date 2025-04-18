@@ -118,7 +118,7 @@ class AllAnimeScraper:
     DETAILS_QUERY = """query ($_id: String!) { show(_id: $_id) { _id name englishName nativeName thumbnail description genres studios season status score type availableEpisodesDetail } }"""
 # Note: Added more fields to DETAILS_QUERY based on animeDetailsParse usage
 
-    EPISODES_QUERY = "query ($_id: String!) { show(_id: $_id) { _id availableEpisodesDetail { sub dub } } }"
+    EPISODES_QUERY = "query ($_id: String!) { show(_id: $_id) { _id availableEpisodesDetail } }"
 
     STREAMS_QUERY = "query ($showId: String!, $translationType: VaildTranslationTypeEnumType!, $episodeString: String!) { episode(showId: $showId, translationType: $translationType, episodeString: $episodeString) { sourceUrls } }"
 # Note: Simplified STREAMS_QUERY based on Kotlin usage (sourceUrls is the primary need)
@@ -455,18 +455,38 @@ class AllAnimeScraper:
                 return []
 
             available_episodes = show.get('availableEpisodesDetail', {})
-            episode_list_raw = available_episodes.get(sub_pref, []) # Get sub or dub list
+            
+            # Since we now get the whole object, we need to parse it differently
+            if isinstance(available_episodes, dict):
+                episode_list_raw = available_episodes.get(sub_pref, [])
+            else:
+                # Try to parse the string if it's not a dict
+                try:
+                    # It might be a JSON string
+                    if isinstance(available_episodes, str):
+                        available_episodes = json.loads(available_episodes)
+                        episode_list_raw = available_episodes.get(sub_pref, [])
+                    else:
+                        print(f"❌ Unexpected format for availableEpisodesDetail: {type(available_episodes)}")
+                        print(f"Data: {available_episodes}")
+                        episode_list_raw = []
+                except json.JSONDecodeError:
+                    print(f"❌ Could not parse availableEpisodesDetail as JSON: {available_episodes}")
+                    episode_list_raw = []
 
             if not episode_list_raw:
-                 print(f"❌ No '{sub_pref}' episodes found for this anime.")
-                 # Optionally, try the other type if one is empty
-                 other_pref = "dub" if sub_pref == "sub" else "sub"
-                 episode_list_raw = available_episodes.get(other_pref, [])
-                 if episode_list_raw:
-                     print(f"ℹ️ Found '{other_pref}' episodes instead.")
-                     sub_pref = other_pref # Switch preference for this fetch
-                 else:
-                     return [] # Return empty if both are empty
+                print(f"❌ No '{sub_pref}' episodes found for this anime.")
+                # Optionally, try the other type if one is empty
+                other_pref = "dub" if sub_pref == "sub" else "sub"
+                
+                if isinstance(available_episodes, dict):
+                    episode_list_raw = available_episodes.get(other_pref, [])
+                    
+                if episode_list_raw:
+                    print(f"ℹ️ Found '{other_pref}' episodes instead.")
+                    sub_pref = other_pref # Switch preference for this fetch
+                else:
+                    return [] # Return empty if both are empty
 
             show_id = show.get('_id') # Get show ID for stream query
 
