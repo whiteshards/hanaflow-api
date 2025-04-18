@@ -225,7 +225,7 @@ class AllAnimeScraper:
                 'source': 'allanime',
                 # Add other potential fields if needed later from 'item'
                 'type': item.get('type'),
-                'year': item.get('season', {}).get('year'),
+                #'year': item.get('season', {}).get('year'),
             })
         return anime_list
 
@@ -416,7 +416,8 @@ class AllAnimeScraper:
             print("❌ AllAnime details request timed out.")
             return None
         except requests.exceptions.RequestException as e:
-            print(f"❌ Failed to get anime details from AllAnime: {e}")
+            print(f"❌ Failed to get anime details from AllAnime: {e} payload: {data} response: {response.text}")
+            with open("error.txt", "w") as n: n.write("Payload: " + str(data)); n.write("\nRespone Text:" + str(response.text))
             return None
         except json.JSONDecodeError:
             print("❌ Failed to parse JSON response from AllAnime details.")
