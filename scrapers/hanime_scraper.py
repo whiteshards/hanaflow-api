@@ -42,10 +42,24 @@ class HanimeScraper:
             "accept": "application/json, text/plain, */*",
             "content-type": "application/json;charset=UTF-8",
         }
+        # Set up filters
+        self.active_filters = {
+            "included_tags": [],
+            "blacklisted_tags": [],
+            "brands": [],
+            "tags_mode": "AND",
+            "order_by": "likes",
+            "ordering": "desc"
+        }
+        
         # Mimicking the preferences from the Kotlin code
         self.preferences = {
             "preferred_quality": self.PREF_QUALITY_DEFAULT
         }
+        
+        # Load all available tags
+        self.available_tags = self.get_tags()
+        self.available_brands = self.get_brands()
 
     def _get_preference(self, key, default=None):
         """Get a preference value with fallback to default."""
@@ -79,20 +93,127 @@ class HanimeScraper:
 
     def _get_search_parameters(self, filters=None):
         """Extract search parameters from filters, similar to Kotlin."""
-        # Default values
+        # Use active filters if no filters are provided
+        if not filters:
+            return (
+                self.active_filters["included_tags"],
+                self.active_filters["blacklisted_tags"],
+                self.active_filters["brands"],
+                self.active_filters["tags_mode"],
+                self.active_filters["order_by"],
+                self.active_filters["ordering"]
+            )
+            
+        # Otherwise process the provided filters
         included_tags = []
         blacklisted_tags = []
         brands = []
-        tags_mode = "AND"
-        order_by = "likes"
-        ordering = "desc"
+        tags_mode = self.active_filters["tags_mode"]
+        order_by = self.active_filters["order_by"]
+        ordering = self.active_filters["ordering"]
         
-        # If filter handling is implemented, process them here
-        if filters:
-            # Process filters similar to Kotlin implementation
-            pass
+        # Process filter dict
+        if isinstance(filters, dict):
+            # Process tags
+            if "included_tags" in filters:
+                included_tags = [f'"{tag.lower()}"' for tag in filters["included_tags"]]
             
+            # Process blacklisted tags
+            if "blacklisted_tags" in filters:
+                blacklisted_tags = [f'"{tag.lower()}"' for tag in filters["blacklisted_tags"]]
+            
+            # Process brands
+            if "brands" in filters:
+                brands = [f'"{brand.lower()}"' for brand in filters["brands"]]
+            
+            # Process tag mode
+            if "tags_mode" in filters:
+                tags_mode = filters["tags_mode"].upper()
+            
+            # Process ordering
+            if "order_by" in filters:
+                order_by = filters["order_by"]
+            
+            if "ordering" in filters:
+                ordering = filters["ordering"]
+        
         return (included_tags, blacklisted_tags, brands, tags_mode, order_by, ordering)
+    
+    def set_tag_filter(self, tag_name, state):
+        """
+        Set a tag filter with one of three states:
+        - 1: include the tag
+        - 0: neutral (default)
+        - -1: exclude/blacklist the tag
+        """
+        # Convert tag name to match the format expected by the API
+        tag_name = tag_name.upper()
+        
+        # First remove the tag from both lists to avoid duplication
+        if f'"{tag_name.lower()}"' in self.active_filters["included_tags"]:
+            self.active_filters["included_tags"].remove(f'"{tag_name.lower()}"')
+        
+        if f'"{tag_name.lower()}"' in self.active_filters["blacklisted_tags"]:
+            self.active_filters["blacklisted_tags"].remove(f'"{tag_name.lower()}"')
+        
+        # Then add it to the appropriate list based on state
+        if state == 1:
+            self.active_filters["included_tags"].append(f'"{tag_name.lower()}"')
+        elif state == -1:
+            self.active_filters["blacklisted_tags"].append(f'"{tag_name.lower()}"')
+        
+        print(f"Tag '{tag_name}' filter set to state: {state}")
+        return True
+    
+    def set_brand_filter(self, brand_name, enabled=True):
+        """
+        Enable or disable a brand/production company filter
+        """
+        # Convert to the format expected by the API
+        formatted_brand = f'"{brand_name.lower()}"'
+        
+        # First remove it if it exists
+        if formatted_brand in self.active_filters["brands"]:
+            self.active_filters["brands"].remove(formatted_brand)
+        
+        # Then add it if enabled
+        if enabled:
+            self.active_filters["brands"].append(formatted_brand)
+            
+        print(f"Brand '{brand_name}' filter set to: {enabled}")
+        return True
+    
+    def set_tag_mode(self, mode):
+        """Set tag inclusion mode (AND/OR)"""
+        if mode.upper() in ["AND", "OR"]:
+            self.active_filters["tags_mode"] = mode.upper()
+            print(f"Tag mode set to: {mode.upper()}")
+            return True
+        return False
+    
+    def set_sort_order(self, order_by, ascending=False):
+        """Set sort order"""
+        # Validate order_by against available options
+        valid_options = [opt[1] for opt in self.get_sortable_list()]
+        if order_by in valid_options:
+            self.active_filters["order_by"] = order_by
+            self.active_filters["ordering"] = "asc" if ascending else "desc"
+            print(f"Sort order set to: {order_by} ({self.active_filters['ordering']})")
+            return True
+        return False
+    
+    def clear_filters(self):
+        """Reset all filters to default values"""
+        self.active_filters = {
+            "included_tags": [],
+            "blacklisted_tags": [],
+            "brands": [],
+            "tags_mode": "AND",
+            "order_by": "likes",
+            "ordering": "desc"
+        }
+        print("All filters have been reset")
+        return True
 
     def _is_number(self, text):
         """Check if text is a number, similar to Kotlin's isNumber."""
@@ -281,7 +402,7 @@ class HanimeScraper:
             print(f"❌ Error getting episodes from hanime: {e}")
             return []
 
-    def get_video_streams(self, episode_url):
+    def get_video_sources(self, episode_url):
         """Get video streams, similar to Kotlin's videoListParse."""
         print(f"🎥 Getting video streams from hanime: {episode_url}")
         
@@ -290,38 +411,53 @@ class HanimeScraper:
             self._set_auth_cookie()
             
             if self.auth_cookie:
-                return self._fetch_premium_videos(episode_url)
-            
-            # Regular video fetching
-            response = self.session.get(episode_url, headers=self.headers, timeout=15)
-            response.raise_for_status()
-            
-            response_data = response.json()
-            
-            # Extract videos from manifest
-            videos_manifest = response_data.get('videos_manifest', {})
-            servers = videos_manifest.get('servers', [])
-            
-            if not servers or len(servers) == 0:
-                print("❌ No servers found in the manifest.")
-                return []
+                video_list = self._fetch_premium_videos(episode_url)
+            else:
+                # Regular video fetching
+                response = self.session.get(episode_url, headers=self.headers, timeout=15)
+                response.raise_for_status()
                 
-            # Get streams from first server
-            streams = servers[0].get('streams', [])
-            
-            # Filter out premium alert streams
-            streams = [s for s in streams if s.get('kind') != 'premium_alert']
-            
-            videos = []
-            for stream in streams:
-                url = stream.get('url', '')
-                height = stream.get('height', '')
-                quality = f"{height}p"
+                response_data = response.json()
                 
-                videos.append(Video(url, quality, url))
+                # Extract videos from manifest
+                videos_manifest = response_data.get('videos_manifest', {})
+                servers = videos_manifest.get('servers', [])
                 
-            # Sort videos by quality preference
-            return self._sort_videos(videos)
+                if not servers or len(servers) == 0:
+                    print("❌ No servers found in the manifest.")
+                    return []
+                    
+                # Get streams from first server
+                streams = servers[0].get('streams', [])
+                
+                # Filter out premium alert streams
+                streams = [s for s in streams if s.get('kind') != 'premium_alert']
+                
+                video_list = []
+                for stream in streams:
+                    url = stream.get('url', '')
+                    height = stream.get('height', '')
+                    quality = f"{height}p"
+                    
+                    video_list.append(Video(url, quality, url))
+            
+            # Create sources format for the CLI
+            video_sources = []
+            for video in video_list:
+                video_sources.append({
+                    'url': video.videoUrl,
+                    'quality': video.videoTitle
+                })
+                
+            # Log and save to urls.txt
+            with open('urls.txt', 'a', encoding='utf-8') as f:
+                f.write(f"\n==== Hanime: {len(video_sources)} quality options ====\n")
+                for source in video_sources:
+                    source_line = f"{source['quality']}: {source['url']}\n"
+                    f.write(source_line)
+                f.write("\n")
+            
+            return video_sources
             
         except Exception as e:
             print(f"❌ Error getting video streams from hanime: {e}")
@@ -373,23 +509,18 @@ class HanimeScraper:
             return []
 
     def _sort_videos(self, videos):
-        """Sort videos by quality preference, similar to Kotlin's sort method."""
-        preferred_quality = self._get_preference('preferred_quality', self.PREF_QUALITY_DEFAULT)
-        
-        # Define the sort key function
+        """Sort videos by resolution (highest to lowest)."""
+        # Define the sort key function for resolution
         def sort_key(video):
-            # First priority: matches preferred quality
-            preferred_priority = 1 if preferred_quality in video.videoTitle else 0
-            
-            # Second priority: resolution value
+            # Get resolution value
             resolution = 0
             match = re.search(r'(\d+)p', video.videoTitle)
             if match:
                 resolution = int(match.group(1))
                 
-            return (-preferred_priority, -resolution)
+            return -resolution  # negative for descending order
             
-        # Sort the videos
+        # Return all videos sorted by resolution
         return sorted(videos, key=sort_key)
 
     def get_tags(self):
@@ -481,9 +612,12 @@ class HanimeScraper:
             ("Alphabetical", "title_sortable"),
         ]
 
-    def set_preferred_quality(self, quality):
+    def set_quality(self, quality):
         """Set preferred video quality."""
         if quality in self.QUALITY_LIST:
             self.preferences["preferred_quality"] = quality
+            print(f"Quality preference set to: {quality}")
             return True
-        return False
+        else:
+            print(f"Invalid quality. Available options: {', '.join(self.QUALITY_LIST)}")
+            return False

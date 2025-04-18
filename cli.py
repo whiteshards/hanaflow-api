@@ -71,10 +71,131 @@ def main_menu():
                         print(f"Found {len(all_anime_results)} results from AllAnime")
 
                     if choice == '5':
-                        search_query = input("Enter search query for Hanime: ")
-                        results = hanime_searcher.search_anime(search_query)
-                        all_results = results #Update all_results
-                        source = 'hanime' # Set source for hanime
+                        # Hanime search submenu
+                        print("\nHanime Search Options:")
+                        print("1. Basic Search")
+                        print("2. Manage Tag Filters")
+                        print("3. Manage Production Company Filters")
+                        print("4. Set Tag Mode (AND/OR)")
+                        print("5. Set Sort Order")
+                        print("6. Clear All Filters")
+                        print("7. Go Back")
+
+                        hanime_choice = input("\nEnter your choice (1-7): ")
+
+                        if hanime_choice == '1':
+                            search_query = input("Enter search query for Hanime: ")
+                            results = hanime_searcher.search_anime(search_query)
+                            all_results = results 
+                            source = 'hanime'
+                        elif hanime_choice == '2':
+                            # Tag management submenu
+                            print("\nManage Tag Filters:")
+                            print("Enter tag name and state (1=include, 0=neutral, -1=exclude)")
+                            print("Available tags:")
+
+                            # Display tags in multiple columns
+                            tags = hanime_searcher.get_tags()
+                            for i, tag in enumerate(tags):
+                                print(f"{i+1}. {tag['name']}", end="\t")
+                                if (i+1) % 5 == 0:  # 5 columns
+                                    print()
+                            print("\n")
+
+                            tag_idx = input("Enter tag number or name (or 0 to cancel): ")
+                            if tag_idx == '0':
+                                continue
+
+                            try:
+                                if tag_idx.isdigit() and 1 <= int(tag_idx) <= len(tags):
+                                    tag_name = tags[int(tag_idx)-1]['name']
+                                else:
+                                    tag_name = tag_idx
+
+                                state = int(input("Enter state (1=include, 0=neutral, -1=exclude): "))
+                                if -1 <= state <= 1:
+                                    hanime_searcher.set_tag_filter(tag_name, state)
+                                else:
+                                    print("Invalid state. Please use 1, 0, or -1.")
+                            except Exception as e:
+                                print(f"Error setting tag filter: {e}")
+                            continue
+
+                        elif hanime_choice == '3':
+                            # Production company management submenu
+                            print("\nManage Production Company Filters:")
+                            print("Available production companies:")
+
+                            # Display companies in multiple columns
+                            companies = hanime_searcher.get_brands()
+                            for i, company in enumerate(companies):
+                                if i < 100:  # Limit display to avoid overwhelming console
+                                    print(f"{i+1}. {company['name']}", end="\t")
+                                    if (i+1) % 3 == 0:  # 3 columns
+                                        print()
+                            print("\n(Showing first 100 companies)")
+                            print("\n")
+
+                            company_idx = input("Enter company number or name (or 0 to cancel): ")
+                            if company_idx == '0':
+                                continue
+
+                            try:
+                                if company_idx.isdigit() and 1 <= int(company_idx) <= len(companies):
+                                    company_name = companies[int(company_idx)-1]['id']
+                                else:
+                                    company_name = company_idx
+
+                                enabled = input("Enable filter? (y/n): ").lower() == 'y'
+                                hanime_searcher.set_brand_filter(company_name, enabled)
+                            except Exception as e:
+                                print(f"Error setting company filter: {e}")
+                            continue
+
+                        elif hanime_choice == '4':
+                            # Tag mode setting
+                            print("\nSet Tag Mode:")
+                            print("1. AND (all tags must match)")
+                            print("2. OR (any tag can match)")
+
+                            mode_choice = input("Enter your choice (1-2): ")
+                            if mode_choice == '1':
+                                hanime_searcher.set_tag_mode("AND")
+                            elif mode_choice == '2':
+                                hanime_searcher.set_tag_mode("OR")
+                            else:
+                                print("Invalid choice.")
+                            continue
+
+                        elif hanime_choice == '5':
+                            # Sort order setting
+                            print("\nSet Sort Order:")
+                            sort_options = hanime_searcher.get_sortable_list()
+                            for i, option in enumerate(sort_options):
+                                print(f"{i+1}. {option[0]}")
+
+                            sort_choice = input(f"Enter your choice (1-{len(sort_options)}): ")
+                            if sort_choice.isdigit() and 1 <= int(sort_choice) <= len(sort_options):
+                                direction = input("Sort ascending? (y/n): ").lower() == 'y'
+                                option_idx = int(sort_choice) - 1
+                                hanime_searcher.set_sort_order(sort_options[option_idx][1], direction)
+                            else:
+                                print("Invalid choice.")
+                            continue
+
+                        elif hanime_choice == '6':
+                            # Clear all filters
+                            hanime_searcher.clear_filters()
+                            print("All filters have been reset.")
+                            continue
+
+                        elif hanime_choice == '7':
+                            # Go back to main menu
+                            continue
+
+                        else:
+                            print("Invalid choice.")
+                            continue
 
 
                     if not all_results:
