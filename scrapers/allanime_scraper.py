@@ -115,7 +115,7 @@ class AllAnimeScraper:
     SEARCH_QUERY = "query ($search: SearchInput, $limit: Int, $page: Int, $translationType: VaildTranslationTypeEnumType, $countryOrigin: VaildCountryOriginEnumType) { shows(search: $search, limit: $limit, page: $page, translationType: $translationType, countryOrigin: $countryOrigin) { edges { _id name englishName nativeName thumbnail slugTime type season score availableEpisodesDetail } } }"
 # Note: Added more fields to SEARCH_QUERY based on parseAnime usage
 
-    DETAILS_QUERY = "query ($_id: String!) { show(_id: $_id) { _id name englishName nativeName thumbnail description genres studios season { quarter year } status score type availableEpisodesDetail { sub dub } } }"
+    DETAILS_QUERY = """query ($_id: String!) { show(_id: $_id) { _id name englishName nativeName thumbnail description genres studios season status score type availableEpisodesDetail } }"""
 # Note: Added more fields to DETAILS_QUERY based on animeDetailsParse usage
 
     EPISODES_QUERY = "query ($_id: String!) { show(_id: $_id) { _id availableEpisodesDetail { sub dub } } }"
@@ -528,27 +528,27 @@ class AllAnimeScraper:
             response.raise_for_status()
 
             response_data: EpisodeResult = response.json()
-            
+
             # Add detailed debugging
             print(f"DEBUG: Raw response: {json.dumps(response_data)[:300]}...")
-            
+
             data_obj = response_data.get('data')
             if not data_obj:
                 print("❌ No 'data' field in API response.")
                 print(f"Full response: {response_data}")
                 return []
-                
+
             episode_data = data_obj.get('episode')
             if not episode_data:
                 print("❌ No 'episode' field in data object.")
                 print(f"Data object: {data_obj}")
                 return []
-                
+
             if not isinstance(episode_data, dict):
                 print(f"❌ 'episode' is not a dictionary. Type: {type(episode_data)}")
                 print(f"Episode data: {episode_data}")
                 return []
-                
+
             if 'sourceUrls' not in episode_data:
                 print("❌ 'sourceUrls' field not found in episode data.")
                 print(f"Episode data keys: {episode_data.keys()}")
@@ -558,7 +558,7 @@ class AllAnimeScraper:
             if not raw_source_urls:
                 print("❌ 'sourceUrls' is empty or null.")
                 return []
-            
+
             print(f"DEBUG: Found {len(raw_source_urls)} raw sources.")
             if not isinstance(raw_source_urls, list):
                  print(f"❌ Unexpected format for sourceUrls: {type(raw_source_urls)}")
