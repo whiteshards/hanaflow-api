@@ -53,9 +53,21 @@ class AniZoneSearcher:
             self.token = ""  # Reset token too to ensure fresh session
             
             # Prepare updates and calls for request
+            # Structure the updates like the Kotlin implementation
             updates = {
-                "search": query,
-                "sort": "title-asc"
+                "data": {
+                    "anime": [None, {"class": "anime", "key": 68, "s": "mdl"}],
+                    "title": None,
+                    "search": query,
+                    "listSize": 1104,
+                    "sort": "title-asc",
+                    "sortOptions": [
+                        {"release-asc": "First Aired", "release-desc": "Last Aired"}, 
+                        {"s": "arr"}
+                    ],
+                    "view": "list",
+                    "paginators": [{"page": 1}, {"s": "arr"}]
+                }
             }
             calls = []
             
@@ -789,7 +801,20 @@ class AniZoneSearcher:
         request_headers['Content-Type'] = "application/json"
         request_headers['X-CSRF-TOKEN'] = self.token
         
-        # Prepare the request body
+        # Prepare the request body - Properly merge snapshot if available
+        if 'data' in updates and self.snapshots[map_key]:
+            try:
+                # Try to parse existing snapshot JSON and merge with updates
+                snapshot_json = json.loads(self.snapshots[map_key])
+                # Only merge data fields if snapshot has data
+                if 'data' in snapshot_json:
+                    # Keep provided updates fields, but fill missing ones from snapshot
+                    for key, value in snapshot_json['data'].items():
+                        if key not in updates['data']:
+                            updates['data'][key] = value
+            except json.JSONDecodeError:
+                print(f"⚠️ Warning: Could not parse snapshot JSON for merging")
+        
         request_body = {
             "_token": self.token,
             "components": [
@@ -815,6 +840,7 @@ class AniZoneSearcher:
                 livewire_url = f"{self.base_url}livewire/update"
                 
             print(f"🔄 Sending Livewire request to: {livewire_url}")
+            print(f"Request body: {json.dumps(request_body)[:200]}...")
                 
             response = self.session.post(
                 livewire_url,
@@ -822,6 +848,13 @@ class AniZoneSearcher:
                 json=request_body,
                 timeout=15
             )
+            
+            if response.status_code != 200:
+                print(f"❌ Response status code: {response.status_code}")
+                try:
+                    print(f"Response text preview: {response.text[:500]}")
+                except:
+                    print("Could not print response text")
             
             # Handle 500 errors gracefully
             if response.status_code == 500:
