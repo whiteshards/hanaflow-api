@@ -1,5 +1,4 @@
 requests
 cloudscraper
 pycryptodome
-re
 beautifulsoup4
