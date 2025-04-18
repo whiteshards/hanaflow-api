@@ -112,7 +112,7 @@ class AllAnimeScraper:
     PAGE_SIZE = 26
 
     # GraphQL Query Constants (Copied carefully, ensure formatting is exact)
-    SEARCH_QUERY = "query ($search: SearchInput, $limit: Int, $page: Int, $translationType: VaildTranslationTypeEnumType, $countryOrigin: String) { shows(search: $search, limit: $limit, page: $page, translationType: $translationType, countryOrigin: $countryOrigin) { edges { _id name englishName nativeName thumbnail slugTime type season score availableEpisodesDetail } } }"
+    SEARCH_QUERY = "query ($search: SearchInput, $limit: Int, $page: Int, $translationType: VaildTranslationTypeEnumType, $countryOrigin: VaildCountryOriginEnumType) { shows(search: $search, limit: $limit, page: $page, translationType: $translationType, countryOrigin: $countryOrigin) { edges { _id name englishName nativeName thumbnail slugTime type season score availableEpisodesDetail } } }"
 # Note: Added more fields to SEARCH_QUERY based on parseAnime usage
 
     DETAILS_QUERY = "query ($_id: String!) { show(_id: $_id) { _id name englishName nativeName thumbnail description genres studios season { quarter year } status score type availableEpisodesDetail { sub dub } } }"
