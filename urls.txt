@@ -132,6 +132,9 @@ Softsub:
   Subtitle (Chinese - China): https://seiryuu.vid-cdn.xyz/06498c79-e525-406f-b288-982ffb11fe50/subtitles/15_zh-Hans.ass
   Subtitle (Chinese - Hong Kong): https://seiryuu.vid-cdn.xyz/06498c79-e525-406f-b288-982ffb11fe50/subtitles/16_zh-Hant.ass
 
-==== AllAnime: Episode 1 (sub) ====
-Okru - Original: https://ok.ru/videoembed/2554615433874
-Mp4upload: https://mp4upload.com/embed-f7hqtkzm1kdk.html
+==== AllAnime: Episode 1 (sub) ==
+==== Hanime: 3 quality options ====
+720p: https://m3u8s.highwinds-cdn.com/api/v9/m3u8s/22jx3hdn4qhzv67tgz0v8lnjh1Znbb06qyt124rz1dzy3A2hknwb2.m3u8
+480p: https://m3u8s.highwinds-cdn.com/api/v9/m3u8s/zvtsssrA5mzh4z2q21lk544pzyZghb47gnAfjkhq7kwzkm4m2j477.m3u8
+360p: https://m3u8s.highwinds-cdn.com/api/v9/m3u8s/gpl0gvl1ww1vdmpzznl0lnj8nqZm2j3AwvgqjAmhd6q90d0yj6hgy.m3u8
+
