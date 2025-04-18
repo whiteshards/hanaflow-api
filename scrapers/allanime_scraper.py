@@ -527,14 +527,38 @@ class AllAnimeScraper:
             response.raise_for_status()
 
             response_data: EpisodeResult = response.json()
-            episode_data = response_data.get('data', {}).get('episode')
-
-            if not episode_data or not isinstance(episode_data, dict) or 'sourceUrls' not in episode_data:
-                print("❌ No video sources found in API response.")
-                print(f"Response data: {response_data}")
+            
+            # Add detailed debugging
+            print(f"DEBUG: Raw response: {json.dumps(response_data)[:300]}...")
+            
+            data_obj = response_data.get('data')
+            if not data_obj:
+                print("❌ No 'data' field in API response.")
+                print(f"Full response: {response_data}")
+                return []
+                
+            episode_data = data_obj.get('episode')
+            if not episode_data:
+                print("❌ No 'episode' field in data object.")
+                print(f"Data object: {data_obj}")
+                return []
+                
+            if not isinstance(episode_data, dict):
+                print(f"❌ 'episode' is not a dictionary. Type: {type(episode_data)}")
+                print(f"Episode data: {episode_data}")
+                return []
+                
+            if 'sourceUrls' not in episode_data:
+                print("❌ 'sourceUrls' field not found in episode data.")
+                print(f"Episode data keys: {episode_data.keys()}")
                 return []
 
             raw_source_urls = episode_data.get('sourceUrls', [])
+            if not raw_source_urls:
+                print("❌ 'sourceUrls' is empty or null.")
+                return []
+            
+            print(f"DEBUG: Found {len(raw_source_urls)} raw sources.")
             if not isinstance(raw_source_urls, list):
                  print(f"❌ Unexpected format for sourceUrls: {type(raw_source_urls)}")
                  return []
