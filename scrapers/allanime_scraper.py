@@ -529,8 +529,9 @@ class AllAnimeScraper:
             response_data: EpisodeResult = response.json()
             episode_data = response_data.get('data', {}).get('episode')
 
-            if not episode_data or 'sourceUrls' not in episode_data:
+            if not episode_data or not isinstance(episode_data, dict) or 'sourceUrls' not in episode_data:
                 print("❌ No video sources found in API response.")
+                print(f"Response data: {response_data}")
                 return []
 
             raw_source_urls = episode_data.get('sourceUrls', [])
