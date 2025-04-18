@@ -1,2 +1,1490 @@
 Payload: {'variables': {'_id': 'dqvMzB6h9MQA5XJEz'}, 'query': 'query ($_id: String!) { show(_id: $_id) { _id availableEpisodesDetail { sub dub } } }'}
 Respone Text:{"errors":[{"message":"Field \"availableEpisodesDetail\" must not have a selection since type \"Object\" has no subfields.","locations":[{"line":1,"column":71}],"extensions":{"code":"GRAPHQL_VALIDATION_FAILED"}}]}
+
+
+===== STARTING VIDEO SOURCE EXTRACTION =====
+Timestamp: 2025-04-18 12:34:24
+Episode payload (truncated): {"variables": {"showId": "dqvMzB6h9MQA5XJEz", "translationType": "sub", "episodeString": "1"}, "query": "query ($showId: String!, $translationType: VaildTranslationTypeEnumType!, $episodeString: Strin...
+API Response Status: 200
+API Request URL: https://api.allanime.day/api
+API Request Headers: {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Origin': 'https://allanime.to', 'Referer': 'https://allanime.to/', 'Host': 'api.allanime.day', 'Content-Length': '315', 'Content-Type': 'application/json'}
+API Request Body: {"variables": {"showId": "dqvMzB6h9MQA5XJEz", "translationType": "sub", "episodeString": "1"}, "query": "query ($showId: String!, $translationType: VaildTranslationTypeEnumType!, $episodeString: String!) { episode(showId: $showId, translationType: $translationType, episodeString: $episodeString) { sourceUrls } }"}
+
+Response Data: {
+  "data": {
+    "episode": {
+      "sourceUrls": [
+        {
+          "sourceUrl": "//vidstreaming.io/load.php?id=NjQ3MQ==&title=Bakemonogatari&typesub=SUB&sub=eyJlbiI6bnVsbCwiZXMiOm51bGx9&cover=aW1hZ2VzL2FuaW1lL0IvYmFrZW1vbm9nYXRhcmkuanBn",
+          "priority": 4,
+          "sourceName": "Vid-mp4",
+          "type": "iframe",
+          "className": "",
+          "streamerId": "allanime",
+          "downloads": {
+            "sourceName": "Gl",
+            "downloadUrl": "https://s3embtaku.pro/download?id=NjQ3MQ==&title=Bakemonogatari&typesub=SUB&sub=eyJlbiI6bnVsbCwiZXMiOm51bGx9&cover=aW1hZ2VzL2FuaW1lL0IvYmFrZW1vbm9nYXRhcmkuanBn&sandbox=allow-forms%20allow-scripts%20allow-same-origin%20allow-downloads"
+          }
+        },
+        {
+          "sourceUrl": "https://ok.ru/videoembed/2768597813906",
+          "priority": 3.5,
+          "sourceName": "Ok",
+          "type": "iframe",
+          "sandbox": "allow-forms allow-scripts allow-same-origin",
+          "className": "text-info",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "https://streamsb.net/e/lsh2vl7dcswg.html",
+          "priority": 5.5,
+          "sourceName": "Ss-Hls",
+          "type": "iframe",
+          "className": "text-danger",
+          "streamerId": "allanime",
+          "downloads": {
+            "sourceName": "StreamSB",
+            "downloadUrl": "https://streamsb.net/d/lsh2vl7dcswg.html"
+          }
+        },
+        {
+          "sourceUrl": "--504c4c484b0217174c5757544b165e594b4c0c4b485d5d5c164a4b4e4817174e515c5d574b175c494e75427a0e50017569790d60727d42174b4d5a1709",
+          "priority": 7.9,
+          "sourceName": "Yt-mp4",
+          "type": "player",
+          "className": "",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "https://mp4upload.com/embed-if27slx4mua9.html",
+          "priority": 4,
+          "sourceName": "Mp4",
+          "type": "iframe",
+          "sandbox": "allow-forms allow-scripts allow-same-origin",
+          "className": "",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "https://videos.sh/embed-uf91djsdb2n6.html",
+          "priority": 0.11,
+          "sourceName": "Other",
+          "type": "iframe",
+          "sandbox": "allow-scripts",
+          "className": "text-secondary",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e0f0b0c0e0f0e0f0b5e0e080d010e0d0b5e0e0a0b0f0b080b0c0e0c0b090e080b0f0b0c0b080b0a0b0f0b0f0e0a0e0f0e0c0b5d0b080e0a0e0f0b0e0b0e0e0b0e0a0e0d0b5d0b080b5d0b0d0e0a0a0e0f590a0e0e0c0b090e0b0e0a0b5e0b090e080b0e0b0d0e080b080b0d0b090b5d0b080b0b0e080b0b0b0e0b0a0b0f0e080e0c0b0a0b0c0b080b0c0b080e0f0b0e0e0a0e0b0a0e0f590a0e0e5a0e0b0e0a0e5e0e0f0a010e0f0b0c0e0f0e0f0b5e0e080d010e0d0b5e0e0a0b0f0b080b0c0e0c0b090e080b0f0b0c0b080b0a0b0f0b0f0e0a0e0f0e0c0b5d0b080e0a0e0f0b0e0b0e0e0b0e0a0e0d0b5d0b080b5d0b0d0e0a0e080b0e0b0e0b0f0a000e5b0f0e0e090a0e0f590a0e0a590b090b0c0b0e0f0e0a590b0f0b0e0b5d0b0e0f0e0a590b0a0b5d0b0e0f0e0a590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d090e5e0f5d0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0d0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+          "priority": 8.5,
+          "sourceName": "Default",
+          "type": "iframe",
+          "className": "text-info",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0a010f0d0e5e0f0a0e0b0f0d0a010e0f0e000e5e0e5a0e0b0a010d0d0e5d0e0f0f0c0e0b0e0a0a0e0c0a0e010e0d0f0b0e5a0e0b0e000f0a0f0d0a010e0a0f0f0f080c5a0f5b0c0c0b080e5d0b5e0c5a0d0f0c0f0b0b0d5d0c5b0c0b0f5b0d010b0f0d010f0d0f0b0e0c0a000e5a0f0e0b0a0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0d0e5d0e0f0f0c0e0b0f0e0e010e5e0e000f0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0d0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+          "priority": 7.4,
+          "sourceName": "S-mp4",
+          "type": "iframe",
+          "className": "",
+          "streamerId": "allanime",
+          "downloads": {
+            "sourceName": "S-mp4",
+            "downloadUrl": "https://blog.allanime.day/apivtwo/clock/download?id=7d2473746a243c2429756f7263752967686f6b6329556e6774636226426965736b63687275296277704b7c44306e3f4b5747335e4c437c593759757364286b7632242a2475727463676b63744f62243c24556e67746376696f6872242a2462677263243c24343634332b36322b373e5237343c35323c3636283636365c242a24626971686a696762243c727473637b"
+          }
+        },
+        {
+          "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e5d0f0a0f0a0f0e0f0d0b5b0a010a010f0b0f0d0e0b0f0c0f0d0e0d0e590e010f0b0e0a0a000e0d0e010e5a0a010e0b0e5a0e0c0e0b0e0a0a5a0e0b0f0d0b0a0e000b0c0b5d0e0d0b5d0b5d0e5e0f0d0b0d0a000e5d0f0a0e5a0e590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0b0f0d0e0b0f0c0f080e5e0e0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0d0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+          "priority": 1,
+          "sourceName": "Uv-mp4",
+          "type": "iframe",
+          "className": "",
+          "streamerId": "allanime"
+        }
+      ]
+    }
+  }
+}
+
+Found 9 raw sources
+Source 1: {
+  "sourceUrl": "//vidstreaming.io/load.php?id=NjQ3MQ==&title=Bakemonogatari&typesub=SUB&sub=eyJlbiI6bnVsbCwiZXMiOm51bGx9&cover=aW1hZ2VzL2FuaW1lL0IvYmFrZW1vbm9nYXRhcmkuanBn",
+  "priority": 4,
+  "sourceName": "Vid-mp4",
+  "type": "iframe",
+  "className": "",
+  "streamerId": "allanime",
+  "downloads": {
+    "sourceName": "Gl",
+    "downloadUrl": "https://s3embtaku.pro/download?id=NjQ3MQ==&title=Bakemonogatari&typesub=SUB&sub=eyJlbiI6bnVsbCwiZXMiOm51bGx9&cover=aW1hZ2VzL2FuaW1lL0IvYmFrZW1vbm9nYXRhcmkuanBn&sandbox=allow-forms%20allow-scripts%20allow-same-origin%20allow-downloads"
+  }
+}
+Source 2: {
+  "sourceUrl": "https://ok.ru/videoembed/2768597813906",
+  "priority": 3.5,
+  "sourceName": "Ok",
+  "type": "iframe",
+  "sandbox": "allow-forms allow-scripts allow-same-origin",
+  "className": "text-info",
+  "streamerId": "allanime"
+}
+Source 3: {
+  "sourceUrl": "https://streamsb.net/e/lsh2vl7dcswg.html",
+  "priority": 5.5,
+  "sourceName": "Ss-Hls",
+  "type": "iframe",
+  "className": "text-danger",
+  "streamerId": "allanime",
+  "downloads": {
+    "sourceName": "StreamSB",
+    "downloadUrl": "https://streamsb.net/d/lsh2vl7dcswg.html"
+  }
+}
+Source 4: {
+  "sourceUrl": "--504c4c484b0217174c5757544b165e594b4c0c4b485d5d5c164a4b4e4817174e515c5d574b175c494e75427a0e50017569790d60727d42174b4d5a1709",
+  "priority": 7.9,
+  "sourceName": "Yt-mp4",
+  "type": "player",
+  "className": "",
+  "streamerId": "allanime"
+}
+Source 5: {
+  "sourceUrl": "https://mp4upload.com/embed-if27slx4mua9.html",
+  "priority": 4,
+  "sourceName": "Mp4",
+  "type": "iframe",
+  "sandbox": "allow-forms allow-scripts allow-same-origin",
+  "className": "",
+  "streamerId": "allanime"
+}
+Source 6: {
+  "sourceUrl": "https://videos.sh/embed-uf91djsdb2n6.html",
+  "priority": 0.11,
+  "sourceName": "Other",
+  "type": "iframe",
+  "sandbox": "allow-scripts",
+  "className": "text-secondary",
+  "streamerId": "allanime"
+}
+Source 7: {
+  "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e0f0b0c0e0f0e0f0b5e0e080d010e0d0b5e0e0a0b0f0b080b0c0e0c0b090e080b0f0b0c0b080b0a0b0f0b0f0e0a0e0f0e0c0b5d0b080e0a0e0f0b0e0b0e0e0b0e0a0e0d0b5d0b080b5d0b0d0e0a0a0e0f590a0e0e0c0b090e0b0e0a0b5e0b090e080b0e0b0d0e080b080b0d0b090b5d0b080b0b0e080b0b0b0e0b0a0b0f0e080e0c0b0a0b0c0b080b0c0b080e0f0b0e0e0a0e0b0a0e0f590a0e0e5a0e0b0e0a0e5e0e0f0a010e0f0b0c0e0f0e0f0b5e0e080d010e0d0b5e0e0a0b0f0b080b0c0e0c0b090e080b0f0b0c0b080b0a0b0f0b0f0e0a0e0f0e0c0b5d0b080e0a0e0f0b0e0b0e0e0b0e0a0e0d0b5d0b080b5d0b0d0e0a0e080b0e0b0e0b0f0a000e5b0f0e0e090a0e0f590a0e0a590b090b0c0b0e0f0e0a590b0f0b0e0b5d0b0e0f0e0a590b0a0b5d0b0e0f0e0a590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d090e5e0f5d0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0d0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+  "priority": 8.5,
+  "sourceName": "Default",
+  "type": "iframe",
+  "className": "text-info",
+  "streamerId": "allanime"
+}
+Source 8: {
+  "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0a010f0d0e5e0f0a0e0b0f0d0a010e0f0e000e5e0e5a0e0b0a010d0d0e5d0e0f0f0c0e0b0e0a0a0e0c0a0e010e0d0f0b0e5a0e0b0e000f0a0f0d0a010e0a0f0f0f080c5a0f5b0c0c0b080e5d0b5e0c5a0d0f0c0f0b0b0d5d0c5b0c0b0f5b0d010b0f0d010f0d0f0b0e0c0a000e5a0f0e0b0a0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0d0e5d0e0f0f0c0e0b0f0e0e010e5e0e000f0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0d0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+  "priority": 7.4,
+  "sourceName": "S-mp4",
+  "type": "iframe",
+  "className": "",
+  "streamerId": "allanime",
+  "downloads": {
+    "sourceName": "S-mp4",
+    "downloadUrl": "https://blog.allanime.day/apivtwo/clock/download?id=7d2473746a243c2429756f7263752967686f6b6329556e6774636226426965736b63687275296277704b7c44306e3f4b5747335e4c437c593759757364286b7632242a2475727463676b63744f62243c24556e67746376696f6872242a2462677263243c24343634332b36322b373e5237343c35323c3636283636365c242a24626971686a696762243c727473637b"
+  }
+}
+Source 9: {
+  "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e5d0f0a0f0a0f0e0f0d0b5b0a010a010f0b0f0d0e0b0f0c0f0d0e0d0e590e010f0b0e0a0a000e0d0e010e5a0a010e0b0e5a0e0c0e0b0e0a0a5a0e0b0f0d0b0a0e000b0c0b5d0e0d0b5d0b5d0e5e0f0d0b0d0a000e5d0f0a0e5a0e590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0b0f0d0e0b0f0c0f080e5e0e0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0d0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+  "priority": 1,
+  "sourceName": "Uv-mp4",
+  "type": "iframe",
+  "className": "",
+  "streamerId": "allanime"
+}
+Processing source: Vid-mp4
+  Raw URL: //vidstreaming.io/load.php?id=NjQ3MQ==&title=Bakemonogatari&typesub=SUB&sub=eyJlbiI6bnVsbCwiZXMiOm51bGx9&cover=aW1hZ2VzL2FuaW1lL0IvYmFrZW1vbm9nYXRhcmkuanBn
+  Decrypted URL: //vidstreaming.io/load.php?id=NjQ3MQ==&title=Bakemonogatari&typesub=SUB&sub=eyJlbiI6bnVsbCwiZXMiOm51bGx9&cover=aW1hZ2VzL2FuaW1lL0IvYmFrZW1vbm9nYXRhcmkuanBn
+  Type: iframe
+  Priority: 4.0
+  ✅ Added as alt hoster: vidstreaming
+Processing source: Ok
+  Raw URL: https://ok.ru/videoembed/2768597813906
+  Decrypted URL: https://ok.ru/videoembed/2768597813906
+  Type: iframe
+  Priority: 3.5
+  ✅ Added as alt hoster: okru
+Processing source: Ss-Hls
+  Raw URL: https://streamsb.net/e/lsh2vl7dcswg.html
+  Decrypted URL: https://streamsb.net/e/lsh2vl7dcswg.html
+  Type: iframe
+  Priority: 5.5
+  ❌ No matching hoster found, skipped
+Processing source: Yt-mp4
+  Raw URL: --504c4c484b0217174c5757544b165e594b4c0c4b485d5d5c164a4b4e4817174e515c5d574b175c494e75427a0e50017569790d60727d42174b4d5a1709
+  Decrypted URL: https://tools.fast4speed.rsvp//videos/dqvMzB6h9MQA5XJEz/sub/1
+  Type: player
+  Priority: 7.9
+  ✅ Added as player: Yt-mp4
+Processing source: Mp4
+  Raw URL: https://mp4upload.com/embed-if27slx4mua9.html
+  Decrypted URL: https://mp4upload.com/embed-if27slx4mua9.html
+  Type: iframe
+  Priority: 4.0
+  ✅ Added as alt hoster: mp4upload
+Processing source: Other
+  Raw URL: https://videos.sh/embed-uf91djsdb2n6.html
+  Decrypted URL: https://videos.sh/embed-uf91djsdb2n6.html
+  Type: iframe
+  Priority: 0.11
+  ❌ No matching hoster found, skipped
+Processing source: Default
+  Raw URL: --175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e0f0b0c0e0f0e0f0b5e0e080d010e0d0b5e0e0a0b0f0b080b0c0e0c0b090e080b0f0b0c0b080b0a0b0f0b0f0e0a0e0f0e0c0b5d0b080e0a0e0f0b0e0b0e0e0b0e0a0e0d0b5d0b080b5d0b0d0e0a0a0e0f590a0e0e0c0b090e0b0e0a0b5e0b090e080b0e0b0d0e080b080b0d0b090b5d0b080b0b0e080b0b0b0e0b0a0b0f0e080e0c0b0a0b0c0b080b0c0b080e0f0b0e0e0a0e0b0a0e0f590a0e0e5a0e0b0e0a0e5e0e0f0a010e0f0b0c0e0f0e0f0b5e0e080d010e0d0b5e0e0a0b0f0b080b0c0e0c0b090e080b0f0b0c0b080b0a0b0f0b0f0e0a0e0f0e0c0b5d0b080e0a0e0f0b0e0b0e0e0b0e0a0e0d0b5d0b080b5d0b0d0e0a0e080b0e0b0e0b0f0a000e5b0f0e0e090a0e0f590a0e0a590b090b0c0b0e0f0e0a590b0f0b0e0b5d0b0e0f0e0a590b0a0b5d0b0e0f0e0a590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d090e5e0f5d0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0d0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a
+  Decrypted URL: /apivtwo/clock?id=7d2473746a243c24673467673f6059653f623730346431603734303237376267643e30626736366362653e303e3562267a26643163623f31603635603035313e303360333632376064323430343067366263267a266b63626f6729673467673f6059653f623730346431603734303237376267643e30626736366362653e303e356260363637286c7661267a262a313436762a37363e36762a323e36762a242a2475727463676b63744f62243c24516f7e242a2462677263243c24343634332b36322b373e5237343c35323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b
+  Type: iframe
+  Priority: 8.5
+  ✅ Added as internal host: default
+Processing source: S-mp4
+  Raw URL: --175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0a010f0d0e5e0f0a0e0b0f0d0a010e0f0e000e5e0e5a0e0b0a010d0d0e5d0e0f0f0c0e0b0e0a0a0e0c0a0e010e0d0f0b0e5a0e0b0e000f0a0f0d0a010e0a0f0f0f080c5a0f5b0c0c0b080e5d0b5e0c5a0d0f0c0f0b0b0d5d0c5b0c0b0f5b0d010b0f0d010f0d0f0b0e0c0a000e5a0f0e0b0a0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0d0e5d0e0f0f0c0e0b0f0e0e010e5e0e000f0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0d0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a
+  Decrypted URL: /apivtwo/clock?id=7d2473746a243c2429756f7263752967686f6b6329556e6774636226426965736b63687275296277704b7c44306e3f4b5747335e4c437c593759757364286b7632242a2475727463676b63744f62243c24556e67746376696f6872242a2462677263243c24343634332b36322b373e5237343c35323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b
+  Type: iframe
+  Priority: 7.4
+  ✅ Added as internal host: s-mp4
+Processing source: Uv-mp4
+  Raw URL: --175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e5d0f0a0f0a0f0e0f0d0b5b0a010a010f0b0f0d0e0b0f0c0f0d0e0d0e590e010f0b0e0a0a000e0d0e010e5a0a010e0b0e5a0e0c0e0b0e0a0a5a0e0b0f0d0b0a0e000b0c0b5d0e0d0b5d0b5d0e5e0f0d0b0d0a000e5d0f0a0e5a0e590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0b0f0d0e0b0f0c0f080e5e0e0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0d0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a
+  Decrypted URL: /apivtwo/clock?id=7d2473746a243c246e727276753c29297375637475656a6973622865696b29636b6463622b63753268343e653e3e6f7535286e726b6a242a2475727463676b63744f62243c2453756374706f62242a2462677263243c24343634332b36322b373e5237343c35323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b
+  Type: iframe
+  Priority: 1.0
+  ❌ No matching hoster found, skipped
+
+Selected 6 servers for processing
+Server 1: vidstreaming (priority: 4.0)
+Server 2: okru (priority: 3.5)
+Server 3: player@Yt-mp4 (priority: 7.9)
+Server 4: mp4upload (priority: 4.0)
+Server 5: internal Default (priority: 8.5)
+Server 6: internal S-mp4 (priority: 7.4)
+
+Extracting videos from: vidstreaming (//vidstreaming.io/load.php?id=NjQ3MQ==&title=Bakemonogatari&typesub=SUB&sub=eyJlbiI6bnVsbCwiZXMiOm51bGx9&cover=aW1hZ2VzL2FuaW1lL0IvYmFrZW1vbm9nYXRhcmkuanBn)
+
+Attempting GogoStreamExtractor: https://vidstreaming.io/load.php?id=NjQ3MQ==&title=Bakemonogatari&typesub=SUB&sub=eyJlbiI6bnVsbCwiZXMiOm51bGx9&cover=aW1hZ2VzL2FuaW1lL0IvYmFrZW1vbm9nYXRhcmkuanBn
+Error in GogoStreamExtractor: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/urllib3/connection.py", line 516, in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/nb21sc3npfc8gvazwnrjxpvb5d48jysx-python3-3.12.7/lib/python3.12/http/client.py", line 1428, in getresponse
+    response.begin()
+  File "/nix/store/nb21sc3npfc8gvazwnrjxpvb5d48jysx-python3-3.12.7/lib/python3.12/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/nb21sc3npfc8gvazwnrjxpvb5d48jysx-python3-3.12.7/lib/python3.12/http/client.py", line 300, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/urllib3/util/retry.py", line 474, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/urllib3/util/util.py", line 38, in reraise
+    raise value.with_traceback(tb)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/urllib3/connection.py", line 516, in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/nb21sc3npfc8gvazwnrjxpvb5d48jysx-python3-3.12.7/lib/python3.12/http/client.py", line 1428, in getresponse
+    response.begin()
+  File "/nix/store/nb21sc3npfc8gvazwnrjxpvb5d48jysx-python3-3.12.7/lib/python3.12/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/nb21sc3npfc8gvazwnrjxpvb5d48jysx-python3-3.12.7/lib/python3.12/http/client.py", line 300, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/scrapers/allanime_scraper.py", line 282, in videosFromUrl
+    response = self.session.get(serverUrl)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/requests/sessions.py", line 602, in get
+    return self.request("GET", url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/requests/adapters.py", line 682, in send
+    raise ConnectionError(err, request=request)
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Extracted 0 videos
+
+Extracting videos from: okru (https://ok.ru/videoembed/2768597813906)
+
+Attempting OkruExtractor: https://ok.ru/videoembed/2768597813906
+Found data-options: {&quot;playerId&quot;:&quot;VideoPopup_player_2768597813906&quot;,&quot;width&quot;:&quot;491&quot;,...
+Extracted 1 videos
+  Added video: Okru - Original
+
+Extracting videos from: player@Yt-mp4 (https://tools.fast4speed.rsvp//videos/dqvMzB6h9MQA5XJEz/sub/1)
+Player type extraction not implemented
+Extracted 0 videos
+
+Extracting videos from: mp4upload (https://mp4upload.com/embed-if27slx4mua9.html)
+
+Attempting Mp4uploadExtractor: https://mp4upload.com/embed-if27slx4mua9.html
+Extracted 1 videos
+  Added video: Mp4upload
+
+Extracting videos from: internal Default (/apivtwo/clock?id=7d2473746a243c24673467673f6059653f623730346431603734303237376267643e30626736366362653e303e3562267a26643163623f31603635603035313e303360333632376064323430343067366263267a266b63626f6729673467673f6059653f623730346431603734303237376267643e30626736366362653e303e356260363637286c7661267a262a313436762a37363e36762a323e36762a242a2475727463676b63744f62243c24516f7e242a2462677263243c24343634332b36322b373e5237343c35323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b)
+
+Failed to get version endpoint: 523
+Response: <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!--<![endif]-->
+<head>
+<meta http-equiv="refresh" content="0">
+
+<title>allanime.to | 523: Origin is unreachable</title>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" id="cf_styles-css" href="/cdn-cgi/styles/main.css" />
+
+
+</head>
+<body>
+<div id="cf-wrapper">
+    <div id="cf-error-details" class="p-0">
+        <header class="mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8">
+            <h1 class="inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2">
+              <span class="inline-block">Origin is unreachable</span>
+              <span class="code-label">Error code 523</span>
+            </h1>
+            <div>
+               Visit <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">cloudflare.com</a> for more information.
+            </div>
+            <div class="mt-3">2025-04-18 12:34:29 UTC</div>
+        </header>
+        <div class="my-8 bg-gradient-gray">
+            <div class="w-240 lg:w-full mx-auto">
+                <div class="clearfix md:px-8">
+                  
+<div id="cf-browser-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">You</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Browser
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-cloudflare-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    <span class="cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    </a>
+  </div>
+  <span class="md:block w-full truncate">Mumbai</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    Cloudflare
+    </a>
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-host-status" class="cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-server block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">allanime.to</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Host
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-red-error">Error</span>
+</div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="w-240 lg:w-full mx-auto mb-8 lg:px-8">
+            <div class="clearfix">
+                <div class="w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What happened?</h2>
+                    <p>The origin web server is not reachable.</p>
+                </div>
+                <div class="w-1/2 md:w-full float-left leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What can I do?</h2>
+                          <h3 class="text-15 font-semibold mb-2">If you're a visitor of this website:</h3>
+      <p class="mb-6">Please try again in a few minutes.</p>
+
+      <h3 class="text-15 font-semibold mb-2">If you're the owner of this website:</h3>
+      <p><span>Check your DNS Settings. A 523 error means that Cloudflare could not reach your host web server. The most common cause is that your DNS settings are incorrect. Please contact your hosting provider to confirm your origin IP and then make sure the correct IP is listed for your A record in your Cloudflare DNS Settings page.</span> <a rel="noopener noreferrer" href="https://support.cloudflare.com/hc/en-us/articles/200171946-Error-523">Additional troubleshooting information here.</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300">
+  <p class="text-13">
+    <span class="cf-footer-item sm:block sm:mb-1">Cloudflare Ray ID: <strong class="font-semibold">932432434e172e2f</strong></span>
+    <span class="cf-footer-separator sm:hidden">&bull;</span>
+    <span id="cf-footer-item-ip" class="cf-footer-item hidden sm:block sm:mb-1">
+      Your IP:
+      <button type="button" id="cf-footer-ip-reveal" class="cf-footer-ip-reveal-btn">Click to reveal</button>
+      <span class="hidden" id="cf-footer-ip">35.244.11.37</span>
+      <span class="cf-footer-separator sm:hidden">&bull;</span>
+    </span>
+    <span class="cf-footer-item sm:block sm:mb-1"><span>Performance &amp; security by</span> <a rel="noopener noreferrer" href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" id="brand_link" target="_blank">Cloudflare</a></span>
+    
+  </p>
+  <script>(function(){function d(){var b=a.getElementById("cf-footer-item-ip"),c=a.getElementById("cf-footer-ip-reveal");b&&"classList"in b&&(b.classList.remove("hidden"),c.addEventListener("click",function(){c.classList.add("hidden");a.getElementById("cf-footer-ip").classList.remove("hidden")}))}var a=document;document.addEventListener&&a.addEventListener("DOMContentLoaded",d)})();</script>
+</div><!-- /.error-footer -->
+
+
+    </div>
+</div>
+</body>
+</html>
+Extracted 0 videos
+
+Extracting videos from: internal S-mp4 (/apivtwo/clock?id=7d2473746a243c2429756f7263752967686f6b6329556e6774636226426965736b63687275296277704b7c44306e3f4b5747335e4c437c593759757364286b7632242a2475727463676b63744f62243c24556e67746376696f6872242a2462677263243c24343634332b36322b373e5237343c35323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b)
+
+Failed to get version endpoint: 523
+Response: <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!--<![endif]-->
+<head>
+
+
+<title>allanime.to | 523: Origin is unreachable</title>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" id="cf_styles-css" href="/cdn-cgi/styles/main.css" />
+
+
+</head>
+<body>
+<div id="cf-wrapper">
+    <div id="cf-error-details" class="p-0">
+        <header class="mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8">
+            <h1 class="inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2">
+              <span class="inline-block">Origin is unreachable</span>
+              <span class="code-label">Error code 523</span>
+            </h1>
+            <div>
+               Visit <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">cloudflare.com</a> for more information.
+            </div>
+            <div class="mt-3">2025-04-18 12:34:30 UTC</div>
+        </header>
+        <div class="my-8 bg-gradient-gray">
+            <div class="w-240 lg:w-full mx-auto">
+                <div class="clearfix md:px-8">
+                  
+<div id="cf-browser-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">You</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Browser
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-cloudflare-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    <span class="cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    </a>
+  </div>
+  <span class="md:block w-full truncate">Mumbai</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    Cloudflare
+    </a>
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-host-status" class="cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-server block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">allanime.to</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Host
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-red-error">Error</span>
+</div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="w-240 lg:w-full mx-auto mb-8 lg:px-8">
+            <div class="clearfix">
+                <div class="w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What happened?</h2>
+                    <p>The origin web server is not reachable.</p>
+                </div>
+                <div class="w-1/2 md:w-full float-left leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What can I do?</h2>
+                          <h3 class="text-15 font-semibold mb-2">If you're a visitor of this website:</h3>
+      <p class="mb-6">Please try again in a few minutes.</p>
+
+      <h3 class="text-15 font-semibold mb-2">If you're the owner of this website:</h3>
+      <p><span>Check your DNS Settings. A 523 error means that Cloudflare could not reach your host web server. The most common cause is that your DNS settings are incorrect. Please contact your hosting provider to confirm your origin IP and then make sure the correct IP is listed for your A record in your Cloudflare DNS Settings page.</span> <a rel="noopener noreferrer" href="https://support.cloudflare.com/hc/en-us/articles/200171946-Error-523">Additional troubleshooting information here.</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300">
+  <p class="text-13">
+    <span class="cf-footer-item sm:block sm:mb-1">Cloudflare Ray ID: <strong class="font-semibold">93243257e8a02e2f</strong></span>
+    <span class="cf-footer-separator sm:hidden">&bull;</span>
+    <span id="cf-footer-item-ip" class="cf-footer-item hidden sm:block sm:mb-1">
+      Your IP:
+      <button type="button" id="cf-footer-ip-reveal" class="cf-footer-ip-reveal-btn">Click to reveal</button>
+      <span class="hidden" id="cf-footer-ip">35.244.11.37</span>
+      <span class="cf-footer-separator sm:hidden">&bull;</span>
+    </span>
+    <span class="cf-footer-item sm:block sm:mb-1"><span>Performance &amp; security by</span> <a rel="noopener noreferrer" href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" id="brand_link" target="_blank">Cloudflare</a></span>
+    
+  </p>
+  <script>(function(){function d(){var b=a.getElementById("cf-footer-item-ip"),c=a.getElementById("cf-footer-ip-reveal");b&&"classList"in b&&(b.classList.remove("hidden"),c.addEventListener("click",function(){c.classList.add("hidden");a.getElementById("cf-footer-ip").classList.remove("hidden")}))}var a=document;document.addEventListener&&a.addEventListener("DOMContentLoaded",d)})();</script>
+</div><!-- /.error-footer -->
+
+
+    </div>
+</div>
+</body>
+</html>
+Extracted 0 videos
+
+Extracted 2 total videos
+
+Sorting videos with preferences:
+  Preferred server: site_default
+  Preferred quality: 1080
+  Preferred sub/dub: sub
+
+✅ Successfully found 2 video streams
+
+
+===== STARTING VIDEO SOURCE EXTRACTION =====
+Timestamp: 2025-04-18 12:44:04
+Episode payload (truncated): {"variables": {"showId": "QLc78PZcyyh3CiCvf", "translationType": "sub", "episodeString": "1"}, "query": "query ($showId: String!, $translationType: VaildTranslationTypeEnumType!, $episodeString: Strin...
+API Response Status: 200
+API Request URL: https://api.allanime.day/api
+API Request Headers: {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Origin': 'https://allanime.to', 'Referer': 'https://allanime.to/', 'Host': 'api.allanime.day', 'Content-Length': '315', 'Content-Type': 'application/json'}
+API Request Body: {"variables": {"showId": "QLc78PZcyyh3CiCvf", "translationType": "sub", "episodeString": "1"}, "query": "query ($showId: String!, $translationType: VaildTranslationTypeEnumType!, $episodeString: String!) { episode(showId: $showId, translationType: $translationType, episodeString: $episodeString) { sourceUrls } }"}
+
+Response Data: {
+  "data": {
+    "episode": {
+      "sourceUrls": [
+        {
+          "sourceUrl": "--504c4c484b0217174c5757544b165e594b4c0c4b485d5d5c164a4b4e4817174e515c5d574b1769745b0f0068625b4141500b7b517b4e5e174b4d5a1709",
+          "priority": 7.9,
+          "sourceName": "Yt-mp4",
+          "type": "player",
+          "className": "",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "https://mp4upload.com/embed-azvxn10zgyf6.html",
+          "priority": 4,
+          "sourceName": "Mp4",
+          "type": "iframe",
+          "sandbox": "allow-forms allow-scripts allow-same-origin",
+          "className": "",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "https://streamsb.net/e/ir7e55gmw8ui.html",
+          "priority": 5.5,
+          "sourceName": "Ss-Hls",
+          "type": "iframe",
+          "className": "text-danger",
+          "streamerId": "allanime",
+          "downloads": {
+            "sourceName": "StreamSB",
+            "downloadUrl": "https://streamsb.net/d/ir7e55gmw8ui.html"
+          }
+        },
+        {
+          "sourceUrl": "https://ok.ru/videoembed/2755774122642",
+          "priority": 3.5,
+          "sourceName": "Ok",
+          "type": "iframe",
+          "sandbox": "allow-forms allow-scripts allow-same-origin",
+          "className": "text-info",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "https://gogo-play.net/streaming.php?id=MTU3OTc3&title=Fumetsu+no+Anata+e&typesub=SUB&sub=&cover=Y292ZXIvZnVtZXRzdS1uby1hbmF0YS1lLnBuZw==",
+          "priority": 4,
+          "sourceName": "Vid-mp4",
+          "type": "iframe",
+          "className": "",
+          "streamerId": "allanime",
+          "downloads": {
+            "sourceName": "Gl",
+            "downloadUrl": "https://s3embtaku.pro/download?id=MTU3OTc3&title=Fumetsu+no+Anata+e&typesub=SUB&sub=&cover=Y292ZXIvZnVtZXRzdS1uby1hbmF0YS1lLnBuZw==&sandbox=allow-forms%20allow-scripts%20allow-same-origin%20allow-downloads"
+          }
+        },
+        {
+          "sourceUrl": "https://videos.sh/embed-896rgq4zqk5o.html",
+          "priority": 0.11,
+          "sourceName": "Other",
+          "type": "iframe",
+          "sandbox": "allow-scripts",
+          "className": "text-secondary",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e080e0a0b5e0b0a0b0f0e0b0d010b090e0f0e0a0b0a0e0a0b0a0b090e0d0b0e0b5e0b090b0a0b0a0e0f0b0c0b0d0b5d0e0c0b090e080e0b0e0a0e0d0e0f0b5e0b0a0e0a0e0c0b0b0e0b0b0d0b080a0e0f590a0e0b090b5d0e0d0b0b0b0d0e0a0b0e0b0f0e0a0b090b0d0b0d0e080e0b0e0b0b5e0b090e0c0b080b0f0b0d0b5d0e080b0b0e0d0e0c0b0a0e0c0b0a0b0b0e0f0b0c0a0e0f590a0e0e5a0e0b0e0a0e5e0e0f0a010e080e0a0b5e0b0a0b0f0e0b0d010b090e0f0e0a0b0a0e0a0b0a0b090e0d0b0e0b5e0b090b0a0b0a0e0f0b0c0b0d0b5d0e0c0b090e080e0b0e0a0e0d0e0f0b5e0b0a0e0a0e0c0b0b0e0b0b0d0b080e080b0e0b0e0b0f0a000e5b0f0e0e090a0e0f590a0e0a590b0f0b0e0b5d0b0e0f0e0a590b090b0c0b0e0f0e0a590b0a0b5d0b0e0f0e0a590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d090e5e0f5d0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+          "priority": 8.5,
+          "sourceName": "Default",
+          "type": "iframe",
+          "className": "text-info",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0a010f0d0e5e0f0a0e0b0f0d0a010e0f0e000e5e0e5a0e0b0a010d0d0e5d0e0f0f0c0e0b0e0a0a0e0c0a0e010e0d0f0b0e5a0e0b0e000f0a0f0d0a010d0f0c590e0d0b090b5d0d0e0d5b0e0d0f5e0f5e0e5d0b0d0c0d0e5e0c0d0f080e080d010b0f0d010f0d0f0b0e0c0a000e5a0f0e0b0a0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0d0e5d0e0f0f0c0e0b0f0e0e010e5e0e000f0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+          "priority": 7.4,
+          "sourceName": "S-mp4",
+          "type": "iframe",
+          "className": "",
+          "streamerId": "allanime",
+          "downloads": {
+            "sourceName": "S-mp4",
+            "downloadUrl": "https://blog.allanime.day/apivtwo/clock/download?id=7d2473746a243c2429756f7263752967686f6b6329556e6774636226426965736b6368727529574a65313e565c657f7f6e35456f457060593759757364286b7632242a2475727463676b63744f62243c24556e67746376696f6872242a2462677263243c24343634332b36322b373e5237343c32323c3636283636365c242a24626971686a696762243c727473637b"
+          }
+        },
+        {
+          "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0b0f0b0e0b0e0b5d0b090b080b0b0b5e0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0c0c0e0c0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+          "priority": 8.2,
+          "sourceName": "Ak",
+          "type": "iframe",
+          "className": "",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e5d0f0a0f0a0f0e0f0d0b5b0a010a010f0b0f0d0e0b0f0c0f0d0e0d0e590e010f0b0e0a0a000e0d0e010e5a0a010e0b0e5a0e0c0e0b0e0a0a5a0f5b0f0b0f5b0f5b0b080f080e5b0e0a0e080e5c0f0c0f0b0a000e5d0f0a0e5a0e590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0b0f0d0e0b0f0c0f080e5e0e0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+          "priority": 1,
+          "sourceName": "Uv-mp4",
+          "type": "iframe",
+          "className": "",
+          "streamerId": "allanime"
+        },
+        {
+          "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0f0d0f0b0e0c0a5a0f590a5a0f090e0f0f0a0e0d0e5d0a010f0a0e010a5a0f5e0e010f0b0f0c0a5a0e0b0f0a0e0b0f0c0e000e5e0f0a0f5e0a5a0b0f0b0b0b090b0e0b5d0b010e0b0f0e0b5a0b0b0b090b0a0b0e0b0b0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0e000f0d0e0b0f0c0f080e0b0f0c0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0f5a",
+          "priority": 7.6,
+          "sourceName": "Luf-Mp4",
+          "type": "iframe",
+          "className": "",
+          "streamerId": "allanime"
+        }
+      ]
+    }
+  }
+}
+
+Found 11 raw sources
+Source 1: {
+  "sourceUrl": "--504c4c484b0217174c5757544b165e594b4c0c4b485d5d5c164a4b4e4817174e515c5d574b1769745b0f0068625b4141500b7b517b4e5e174b4d5a1709",
+  "priority": 7.9,
+  "sourceName": "Yt-mp4",
+  "type": "player",
+  "className": "",
+  "streamerId": "allanime"
+}
+Source 2: {
+  "sourceUrl": "https://mp4upload.com/embed-azvxn10zgyf6.html",
+  "priority": 4,
+  "sourceName": "Mp4",
+  "type": "iframe",
+  "sandbox": "allow-forms allow-scripts allow-same-origin",
+  "className": "",
+  "streamerId": "allanime"
+}
+Source 3: {
+  "sourceUrl": "https://streamsb.net/e/ir7e55gmw8ui.html",
+  "priority": 5.5,
+  "sourceName": "Ss-Hls",
+  "type": "iframe",
+  "className": "text-danger",
+  "streamerId": "allanime",
+  "downloads": {
+    "sourceName": "StreamSB",
+    "downloadUrl": "https://streamsb.net/d/ir7e55gmw8ui.html"
+  }
+}
+Source 4: {
+  "sourceUrl": "https://ok.ru/videoembed/2755774122642",
+  "priority": 3.5,
+  "sourceName": "Ok",
+  "type": "iframe",
+  "sandbox": "allow-forms allow-scripts allow-same-origin",
+  "className": "text-info",
+  "streamerId": "allanime"
+}
+Source 5: {
+  "sourceUrl": "https://gogo-play.net/streaming.php?id=MTU3OTc3&title=Fumetsu+no+Anata+e&typesub=SUB&sub=&cover=Y292ZXIvZnVtZXRzdS1uby1hbmF0YS1lLnBuZw==",
+  "priority": 4,
+  "sourceName": "Vid-mp4",
+  "type": "iframe",
+  "className": "",
+  "streamerId": "allanime",
+  "downloads": {
+    "sourceName": "Gl",
+    "downloadUrl": "https://s3embtaku.pro/download?id=MTU3OTc3&title=Fumetsu+no+Anata+e&typesub=SUB&sub=&cover=Y292ZXIvZnVtZXRzdS1uby1hbmF0YS1lLnBuZw==&sandbox=allow-forms%20allow-scripts%20allow-same-origin%20allow-downloads"
+  }
+}
+Source 6: {
+  "sourceUrl": "https://videos.sh/embed-896rgq4zqk5o.html",
+  "priority": 0.11,
+  "sourceName": "Other",
+  "type": "iframe",
+  "sandbox": "allow-scripts",
+  "className": "text-secondary",
+  "streamerId": "allanime"
+}
+Source 7: {
+  "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e080e0a0b5e0b0a0b0f0e0b0d010b090e0f0e0a0b0a0e0a0b0a0b090e0d0b0e0b5e0b090b0a0b0a0e0f0b0c0b0d0b5d0e0c0b090e080e0b0e0a0e0d0e0f0b5e0b0a0e0a0e0c0b0b0e0b0b0d0b080a0e0f590a0e0b090b5d0e0d0b0b0b0d0e0a0b0e0b0f0e0a0b090b0d0b0d0e080e0b0e0b0b5e0b090e0c0b080b0f0b0d0b5d0e080b0b0e0d0e0c0b0a0e0c0b0a0b0b0e0f0b0c0a0e0f590a0e0e5a0e0b0e0a0e5e0e0f0a010e080e0a0b5e0b0a0b0f0e0b0d010b090e0f0e0a0b0a0e0a0b0a0b090e0d0b0e0b5e0b090b0a0b0a0e0f0b0c0b0d0b5d0e0c0b090e080e0b0e0a0e0d0e0f0b5e0b0a0e0a0e0c0b0b0e0b0b0d0b080e080b0e0b0e0b0f0a000e5b0f0e0e090a0e0f590a0e0a590b0f0b0e0b5d0b0e0f0e0a590b090b0c0b0e0f0e0a590b0a0b5d0b0e0f0e0a590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d090e5e0f5d0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+  "priority": 8.5,
+  "sourceName": "Default",
+  "type": "iframe",
+  "className": "text-info",
+  "streamerId": "allanime"
+}
+Source 8: {
+  "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0a010f0d0e5e0f0a0e0b0f0d0a010e0f0e000e5e0e5a0e0b0a010d0d0e5d0e0f0f0c0e0b0e0a0a0e0c0a0e010e0d0f0b0e5a0e0b0e000f0a0f0d0a010d0f0c590e0d0b090b5d0d0e0d5b0e0d0f5e0f5e0e5d0b0d0c0d0e5e0c0d0f080e080d010b0f0d010f0d0f0b0e0c0a000e5a0f0e0b0a0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0d0e5d0e0f0f0c0e0b0f0e0e010e5e0e000f0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+  "priority": 7.4,
+  "sourceName": "S-mp4",
+  "type": "iframe",
+  "className": "",
+  "streamerId": "allanime",
+  "downloads": {
+    "sourceName": "S-mp4",
+    "downloadUrl": "https://blog.allanime.day/apivtwo/clock/download?id=7d2473746a243c2429756f7263752967686f6b6329556e6774636226426965736b6368727529574a65313e565c657f7f6e35456f457060593759757364286b7632242a2475727463676b63744f62243c24556e67746376696f6872242a2462677263243c24343634332b36322b373e5237343c32323c3636283636365c242a24626971686a696762243c727473637b"
+  }
+}
+Source 9: {
+  "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0b0f0b0e0b0e0b5d0b090b080b0b0b5e0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0c0c0e0c0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+  "priority": 8.2,
+  "sourceName": "Ak",
+  "type": "iframe",
+  "className": "",
+  "streamerId": "allanime"
+}
+Source 10: {
+  "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e5d0f0a0f0a0f0e0f0d0b5b0a010a010f0b0f0d0e0b0f0c0f0d0e0d0e590e010f0b0e0a0a000e0d0e010e5a0a010e0b0e5a0e0c0e0b0e0a0a5a0f5b0f0b0f5b0f5b0b080f080e5b0e0a0e080e5c0f0c0f0b0a000e5d0f0a0e5a0e590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0b0f0d0e0b0f0c0f080e5e0e0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a",
+  "priority": 1,
+  "sourceName": "Uv-mp4",
+  "type": "iframe",
+  "className": "",
+  "streamerId": "allanime"
+}
+Source 11: {
+  "sourceUrl": "--175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0f0d0f0b0e0c0a5a0f590a5a0f090e0f0f0a0e0d0e5d0a010f0a0e010a5a0f5e0e010f0b0f0c0a5a0e0b0f0a0e0b0f0c0e000e5e0f0a0f5e0a5a0b0f0b0b0b090b0e0b5d0b010e0b0f0e0b5a0b0b0b090b0a0b0e0b0b0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0e000f0d0e0b0f0c0f080e0b0f0c0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0f5a",
+  "priority": 7.6,
+  "sourceName": "Luf-Mp4",
+  "type": "iframe",
+  "className": "",
+  "streamerId": "allanime"
+}
+Processing source: Yt-mp4
+  Raw URL: --504c4c484b0217174c5757544b165e594b4c0c4b485d5d5c164a4b4e4817174e515c5d574b1769745b0f0068625b4141500b7b517b4e5e174b4d5a1709
+  Decrypted URL: https://tools.fast4speed.rsvp//videos/QLc78PZcyyh3CiCvf/sub/1
+  Type: player
+  Priority: 7.9
+  ✅ Added as player: Yt-mp4
+Processing source: Mp4
+  Raw URL: https://mp4upload.com/embed-azvxn10zgyf6.html
+  Decrypted URL: https://mp4upload.com/embed-azvxn10zgyf6.html
+  Type: iframe
+  Priority: 4.0
+  ✅ Added as alt hoster: mp4upload
+Processing source: Ss-Hls
+  Raw URL: https://streamsb.net/e/ir7e55gmw8ui.html
+  Decrypted URL: https://streamsb.net/e/ir7e55gmw8ui.html
+  Type: iframe
+  Priority: 5.5
+  ❌ No matching hoster found, skipped
+Processing source: Ok
+  Raw URL: https://ok.ru/videoembed/2755774122642
+  Decrypted URL: https://ok.ru/videoembed/2755774122642
+  Type: iframe
+  Priority: 3.5
+  ✅ Added as alt hoster: okru
+Processing source: Vid-mp4
+  Raw URL: https://gogo-play.net/streaming.php?id=MTU3OTc3&title=Fumetsu+no+Anata+e&typesub=SUB&sub=&cover=Y292ZXIvZnVtZXRzdS1uby1hbmF0YS1lLnBuZw==
+  Decrypted URL: https://gogo-play.net/streaming.php?id=MTU3OTc3&title=Fumetsu+no+Anata+e&typesub=SUB&sub=&cover=Y292ZXIvZnVtZXRzdS1uby1hbmF0YS1lLnBuZw==
+  Type: iframe
+  Priority: 4.0
+  ✅ Added as alt hoster: vidstreaming
+Processing source: Other
+  Raw URL: https://videos.sh/embed-896rgq4zqk5o.html
+  Decrypted URL: https://videos.sh/embed-896rgq4zqk5o.html
+  Type: iframe
+  Priority: 0.11
+  ❌ No matching hoster found, skipped
+Processing source: Default
+  Raw URL: --175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e080e0a0b5e0b0a0b0f0e0b0d010b090e0f0e0a0b0a0e0a0b0a0b090e0d0b0e0b5e0b090b0a0b0a0e0f0b0c0b0d0b5d0e0c0b090e080e0b0e0a0e0d0e0f0b5e0b0a0e0a0e0c0b0b0e0b0b0d0b080a0e0f590a0e0b090b5d0e0d0b0b0b0d0e0a0b0e0b0f0e0a0b090b0d0b0d0e080e0b0e0b0b5e0b090e0c0b080b0f0b0d0b5d0e080b0b0e0d0e0c0b0a0e0c0b0a0b0b0e0f0b0c0a0e0f590a0e0e5a0e0b0e0a0e5e0e0f0a010e080e0a0b5e0b0a0b0f0e0b0d010b090e0f0e0a0b0a0e0a0b0a0b090e0d0b0e0b5e0b090b0a0b0a0e0f0b0c0b0d0b5d0e0c0b090e080e0b0e0a0e0d0e0f0b5e0b0a0e0a0e0c0b0b0e0b0b0d0b080e080b0e0b0e0b0f0a000e5b0f0e0e090a0e0f590a0e0a590b0f0b0e0b5d0b0e0f0e0a590b090b0c0b0e0f0e0a590b0a0b5d0b0e0f0e0a590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d090e5e0f5d0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a
+  Decrypted URL: /apivtwo/clock?id=7d2473746a243c2460623f323763593167623262323165363f3132326734353e643160636265673f32626433633530267a26313e653335623637623135356063633f31643037353e60336564326432336734267a266b63626f672960623f323763593167623262323165363f3132326734353e643160636265673f3262643363353060363637286c7661267a262a37363e36762a313436762a323e36762a242a2475727463676b63744f62243c24516f7e242a2462677263243c24343634332b36322b373e5237343c32323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b
+  Type: iframe
+  Priority: 8.5
+  ✅ Added as internal host: default
+Processing source: S-mp4
+  Raw URL: --175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0a010f0d0e5e0f0a0e0b0f0d0a010e0f0e000e5e0e5a0e0b0a010d0d0e5d0e0f0f0c0e0b0e0a0a0e0c0a0e010e0d0f0b0e5a0e0b0e000f0a0f0d0a010d0f0c590e0d0b090b5d0d0e0d5b0e0d0f5e0f5e0e5d0b0d0c0d0e5e0c0d0f080e080d010b0f0d010f0d0f0b0e0c0a000e5a0f0e0b0a0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0d0e5d0e0f0f0c0e0b0f0e0e010e5e0e000f0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a
+  Decrypted URL: /apivtwo/clock?id=7d2473746a243c2429756f7263752967686f6b6329556e6774636226426965736b6368727529574a65313e565c657f7f6e35456f457060593759757364286b7632242a2475727463676b63744f62243c24556e67746376696f6872242a2462677263243c24343634332b36322b373e5237343c32323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b
+  Type: iframe
+  Priority: 7.4
+  ✅ Added as internal host: s-mp4
+Processing source: Ak
+  Raw URL: --175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0b0f0b0e0b0e0b5d0b090b080b0b0b5e0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0c0c0e0c0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a
+  Decrypted URL: /apivtwo/clock?id=7d2473746a243c243736363e3130333f242a2475727463676b63744f62243c244464242a2462677263243c24343634332b36322b373e5237343c32323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b
+  Type: iframe
+  Priority: 8.2
+  ✅ Added as internal host: ak
+Processing source: Uv-mp4
+  Raw URL: --175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0e5d0f0a0f0a0f0e0f0d0b5b0a010a010f0b0f0d0e0b0f0c0f0d0e0d0e590e010f0b0e0a0a000e0d0e010e5a0a010e0b0e5a0e0c0e0b0e0a0a5a0f5b0f0b0f5b0f5b0b080f080e5b0e0a0e080e5c0f0c0f0b0a000e5d0f0a0e5a0e590a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0d0b0f0d0e0b0f0c0f080e5e0e0a0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0a590a0c0f0a0f0c0e0f0e000f0d0e590e0f0f0a0e5e0e010e000d0a0f5e0f0e0e0b0a0c0b5b0a0c0f0d0f0b0e0c0a0c0f5a
+  Decrypted URL: /apivtwo/clock?id=7d2473746a243c246e727276753c29297375637475656a6973622865696b29636b6463622b7c737c7c30706c62606d7473286e726b6a242a2475727463676b63744f62243c2453756374706f62242a2462677263243c24343634332b36322b373e5237343c32323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b
+  Type: iframe
+  Priority: 1.0
+  ❌ No matching hoster found, skipped
+Processing source: Luf-Mp4
+  Raw URL: --175948514e4c4f57175b54575b5307515c050f5c0a0c0f0b0f0c0e590a0c0b5b0a0c0f0d0f0b0e0c0a5a0f590a5a0f090e0f0f0a0e0d0e5d0a010f0a0e010a5a0f5e0e010f0b0f0c0a5a0e0b0f0a0e0b0f0c0e000e5e0f0a0f5e0a5a0b0f0b0b0b090b0e0b5d0b010e0b0f0e0b5a0b0b0b090b0a0b0e0b0b0a0c0a590a0c0f0d0f0a0f0c0e0b0e0f0e5a0e0b0f0c0c5e0e0a0a0c0b5b0a0c0e000f0d0e0b0f0c0f080e0b0f0c0a0c0a590a0c0e0a0e0f0f0a0e0b0a0c0b5b0a0c0b0c0b0e0b0c0b0b0a5a0b0e0b0a0a5a0b0f0b5d0d0a0b0f0b0c0b5b0b0a0b0a0b5b0b0e0b0e0a000b0e0b0e0b0e0d5b0a0c0f5a
+  Decrypted URL: /apivtwo/clock?id=7d2473746a243c247573642b7a2b716772656e2972692b7f6973742b63726374686f727f2b373331363e3963763b3331323633242a2475727463676b63744f62243c2468756374706374242a2462677263243c24343634332b36322b373e5237343c32323c3636283636365c247b
+  Type: iframe
+  Priority: 7.6
+  ✅ Added as internal host: luf-mp4
+
+Selected 8 servers for processing
+Server 1: player@Yt-mp4 (priority: 7.9)
+Server 2: mp4upload (priority: 4.0)
+Server 3: okru (priority: 3.5)
+Server 4: vidstreaming (priority: 4.0)
+Server 5: internal Default (priority: 8.5)
+Server 6: internal S-mp4 (priority: 7.4)
+Server 7: internal Ak (priority: 8.2)
+Server 8: internal Luf-Mp4 (priority: 7.6)
+
+Extracting videos from: player@Yt-mp4 (https://tools.fast4speed.rsvp//videos/QLc78PZcyyh3CiCvf/sub/1)
+Player type extraction not implemented
+Extracted 0 videos
+
+Extracting videos from: mp4upload (https://mp4upload.com/embed-azvxn10zgyf6.html)
+
+Attempting Mp4uploadExtractor: https://mp4upload.com/embed-azvxn10zgyf6.html
+Extracted 1 videos
+  Added video: Mp4upload
+
+Extracting videos from: okru (https://ok.ru/videoembed/2755774122642)
+
+Attempting OkruExtractor: https://ok.ru/videoembed/2755774122642
+Found data-options: {&quot;playerId&quot;:&quot;VideoPopup_player_2755774122642&quot;,&quot;width&quot;:&quot;491&quot;,...
+Extracted 1 videos
+  Added video: Okru - Original
+
+Extracting videos from: vidstreaming (https://gogo-play.net/streaming.php?id=MTU3OTc3&title=Fumetsu+no+Anata+e&typesub=SUB&sub=&cover=Y292ZXIvZnVtZXRzdS1uby1hbmF0YS1lLnBuZw==)
+
+Attempting GogoStreamExtractor: https:https://gogo-play.net/streaming.php?id=MTU3OTc3&title=Fumetsu+no+Anata+e&typesub=SUB&sub=&cover=Y292ZXIvZnVtZXRzdS1uby1hbmF0YS1lLnBuZw==
+Error in GogoStreamExtractor: Invalid URL 'https:https://gogo-play.net/streaming.php?id=MTU3OTc3&title=Fumetsu+no+Anata+e&typesub=SUB&sub=&cover=Y292ZXIvZnVtZXRzdS1uby1hbmF0YS1lLnBuZw==': No host supplied
+Traceback (most recent call last):
+  File "/home/runner/workspace/scrapers/allanime_scraper.py", line 282, in videosFromUrl
+    response = self.session.get(serverUrl)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/requests/sessions.py", line 602, in get
+    return self.request("GET", url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/requests/sessions.py", line 575, in request
+    prep = self.prepare_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/requests/sessions.py", line 484, in prepare_request
+    p.prepare(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/requests/models.py", line 367, in prepare
+    self.prepare_url(url, params)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/requests/models.py", line 444, in prepare_url
+    raise InvalidURL(f"Invalid URL {url!r}: No host supplied")
+requests.exceptions.InvalidURL: Invalid URL 'https:https://gogo-play.net/streaming.php?id=MTU3OTc3&title=Fumetsu+no+Anata+e&typesub=SUB&sub=&cover=Y292ZXIvZnVtZXRzdS1uby1hbmF0YS1lLnBuZw==': No host supplied
+Extracted 0 videos
+
+Extracting videos from: internal Default (/apivtwo/clock?id=7d2473746a243c2460623f323763593167623262323165363f3132326734353e643160636265673f32626433633530267a26313e653335623637623135356063633f31643037353e60336564326432336734267a266b63626f672960623f323763593167623262323165363f3132326734353e643160636265673f3262643363353060363637286c7661267a262a37363e36762a313436762a323e36762a242a2475727463676b63744f62243c24516f7e242a2462677263243c24343634332b36322b373e5237343c32323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b)
+
+Failed to get version endpoint: 523
+Response: <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!--<![endif]-->
+<head>
+<meta http-equiv="refresh" content="0">
+
+<title>allanime.to | 523: Origin is unreachable</title>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" id="cf_styles-css" href="/cdn-cgi/styles/main.css" />
+
+
+</head>
+<body>
+<div id="cf-wrapper">
+    <div id="cf-error-details" class="p-0">
+        <header class="mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8">
+            <h1 class="inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2">
+              <span class="inline-block">Origin is unreachable</span>
+              <span class="code-label">Error code 523</span>
+            </h1>
+            <div>
+               Visit <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">cloudflare.com</a> for more information.
+            </div>
+            <div class="mt-3">2025-04-18 12:44:06 UTC</div>
+        </header>
+        <div class="my-8 bg-gradient-gray">
+            <div class="w-240 lg:w-full mx-auto">
+                <div class="clearfix md:px-8">
+                  
+<div id="cf-browser-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">You</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Browser
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-cloudflare-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    <span class="cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    </a>
+  </div>
+  <span class="md:block w-full truncate">Mumbai</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    Cloudflare
+    </a>
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-host-status" class="cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-server block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">allanime.to</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Host
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-red-error">Error</span>
+</div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="w-240 lg:w-full mx-auto mb-8 lg:px-8">
+            <div class="clearfix">
+                <div class="w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What happened?</h2>
+                    <p>The origin web server is not reachable.</p>
+                </div>
+                <div class="w-1/2 md:w-full float-left leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What can I do?</h2>
+                          <h3 class="text-15 font-semibold mb-2">If you're a visitor of this website:</h3>
+      <p class="mb-6">Please try again in a few minutes.</p>
+
+      <h3 class="text-15 font-semibold mb-2">If you're the owner of this website:</h3>
+      <p><span>Check your DNS Settings. A 523 error means that Cloudflare could not reach your host web server. The most common cause is that your DNS settings are incorrect. Please contact your hosting provider to confirm your origin IP and then make sure the correct IP is listed for your A record in your Cloudflare DNS Settings page.</span> <a rel="noopener noreferrer" href="https://support.cloudflare.com/hc/en-us/articles/200171946-Error-523">Additional troubleshooting information here.</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300">
+  <p class="text-13">
+    <span class="cf-footer-item sm:block sm:mb-1">Cloudflare Ray ID: <strong class="font-semibold">932440674a6c851f</strong></span>
+    <span class="cf-footer-separator sm:hidden">&bull;</span>
+    <span id="cf-footer-item-ip" class="cf-footer-item hidden sm:block sm:mb-1">
+      Your IP:
+      <button type="button" id="cf-footer-ip-reveal" class="cf-footer-ip-reveal-btn">Click to reveal</button>
+      <span class="hidden" id="cf-footer-ip">35.244.11.37</span>
+      <span class="cf-footer-separator sm:hidden">&bull;</span>
+    </span>
+    <span class="cf-footer-item sm:block sm:mb-1"><span>Performance &amp; security by</span> <a rel="noopener noreferrer" href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" id="brand_link" target="_blank">Cloudflare</a></span>
+    
+  </p>
+  <script>(function(){function d(){var b=a.getElementById("cf-footer-item-ip"),c=a.getElementById("cf-footer-ip-reveal");b&&"classList"in b&&(b.classList.remove("hidden"),c.addEventListener("click",function(){c.classList.add("hidden");a.getElementById("cf-footer-ip").classList.remove("hidden")}))}var a=document;document.addEventListener&&a.addEventListener("DOMContentLoaded",d)})();</script>
+</div><!-- /.error-footer -->
+
+
+    </div>
+</div>
+</body>
+</html>
+Extracted 0 videos
+
+Extracting videos from: internal S-mp4 (/apivtwo/clock?id=7d2473746a243c2429756f7263752967686f6b6329556e6774636226426965736b6368727529574a65313e565c657f7f6e35456f457060593759757364286b7632242a2475727463676b63744f62243c24556e67746376696f6872242a2462677263243c24343634332b36322b373e5237343c32323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b)
+
+Failed to get version endpoint: 523
+Response: <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!--<![endif]-->
+<head>
+
+
+<title>allanime.to | 523: Origin is unreachable</title>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" id="cf_styles-css" href="/cdn-cgi/styles/main.css" />
+
+
+</head>
+<body>
+<div id="cf-wrapper">
+    <div id="cf-error-details" class="p-0">
+        <header class="mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8">
+            <h1 class="inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2">
+              <span class="inline-block">Origin is unreachable</span>
+              <span class="code-label">Error code 523</span>
+            </h1>
+            <div>
+               Visit <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">cloudflare.com</a> for more information.
+            </div>
+            <div class="mt-3">2025-04-18 12:44:06 UTC</div>
+        </header>
+        <div class="my-8 bg-gradient-gray">
+            <div class="w-240 lg:w-full mx-auto">
+                <div class="clearfix md:px-8">
+                  
+<div id="cf-browser-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">You</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Browser
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-cloudflare-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    <span class="cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    </a>
+  </div>
+  <span class="md:block w-full truncate">Mumbai</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    Cloudflare
+    </a>
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-host-status" class="cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-server block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">allanime.to</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Host
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-red-error">Error</span>
+</div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="w-240 lg:w-full mx-auto mb-8 lg:px-8">
+            <div class="clearfix">
+                <div class="w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What happened?</h2>
+                    <p>The origin web server is not reachable.</p>
+                </div>
+                <div class="w-1/2 md:w-full float-left leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What can I do?</h2>
+                          <h3 class="text-15 font-semibold mb-2">If you're a visitor of this website:</h3>
+      <p class="mb-6">Please try again in a few minutes.</p>
+
+      <h3 class="text-15 font-semibold mb-2">If you're the owner of this website:</h3>
+      <p><span>Check your DNS Settings. A 523 error means that Cloudflare could not reach your host web server. The most common cause is that your DNS settings are incorrect. Please contact your hosting provider to confirm your origin IP and then make sure the correct IP is listed for your A record in your Cloudflare DNS Settings page.</span> <a rel="noopener noreferrer" href="https://support.cloudflare.com/hc/en-us/articles/200171946-Error-523">Additional troubleshooting information here.</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300">
+  <p class="text-13">
+    <span class="cf-footer-item sm:block sm:mb-1">Cloudflare Ray ID: <strong class="font-semibold">9324406c6dfa851f</strong></span>
+    <span class="cf-footer-separator sm:hidden">&bull;</span>
+    <span id="cf-footer-item-ip" class="cf-footer-item hidden sm:block sm:mb-1">
+      Your IP:
+      <button type="button" id="cf-footer-ip-reveal" class="cf-footer-ip-reveal-btn">Click to reveal</button>
+      <span class="hidden" id="cf-footer-ip">35.244.11.37</span>
+      <span class="cf-footer-separator sm:hidden">&bull;</span>
+    </span>
+    <span class="cf-footer-item sm:block sm:mb-1"><span>Performance &amp; security by</span> <a rel="noopener noreferrer" href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" id="brand_link" target="_blank">Cloudflare</a></span>
+    
+  </p>
+  <script>(function(){function d(){var b=a.getElementById("cf-footer-item-ip"),c=a.getElementById("cf-footer-ip-reveal");b&&"classList"in b&&(b.classList.remove("hidden"),c.addEventListener("click",function(){c.classList.add("hidden");a.getElementById("cf-footer-ip").classList.remove("hidden")}))}var a=document;document.addEventListener&&a.addEventListener("DOMContentLoaded",d)})();</script>
+</div><!-- /.error-footer -->
+
+
+    </div>
+</div>
+</body>
+</html>
+Extracted 0 videos
+
+Extracting videos from: internal Ak (/apivtwo/clock?id=7d2473746a243c243736363e3130333f242a2475727463676b63744f62243c244464242a2462677263243c24343634332b36322b373e5237343c32323c3636283636365c242a2472746768756a67726f6968527f7663243c24757364247b)
+
+Failed to get version endpoint: 523
+Response: <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!--<![endif]-->
+<head>
+
+
+<title>allanime.to | 523: Origin is unreachable</title>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" id="cf_styles-css" href="/cdn-cgi/styles/main.css" />
+
+
+</head>
+<body>
+<div id="cf-wrapper">
+    <div id="cf-error-details" class="p-0">
+        <header class="mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8">
+            <h1 class="inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2">
+              <span class="inline-block">Origin is unreachable</span>
+              <span class="code-label">Error code 523</span>
+            </h1>
+            <div>
+               Visit <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">cloudflare.com</a> for more information.
+            </div>
+            <div class="mt-3">2025-04-18 12:44:09 UTC</div>
+        </header>
+        <div class="my-8 bg-gradient-gray">
+            <div class="w-240 lg:w-full mx-auto">
+                <div class="clearfix md:px-8">
+                  
+<div id="cf-browser-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">You</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Browser
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-cloudflare-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    <span class="cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    </a>
+  </div>
+  <span class="md:block w-full truncate">Mumbai</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    Cloudflare
+    </a>
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-host-status" class="cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-server block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">allanime.to</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Host
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-red-error">Error</span>
+</div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="w-240 lg:w-full mx-auto mb-8 lg:px-8">
+            <div class="clearfix">
+                <div class="w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What happened?</h2>
+                    <p>The origin web server is not reachable.</p>
+                </div>
+                <div class="w-1/2 md:w-full float-left leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What can I do?</h2>
+                          <h3 class="text-15 font-semibold mb-2">If you're a visitor of this website:</h3>
+      <p class="mb-6">Please try again in a few minutes.</p>
+
+      <h3 class="text-15 font-semibold mb-2">If you're the owner of this website:</h3>
+      <p><span>Check your DNS Settings. A 523 error means that Cloudflare could not reach your host web server. The most common cause is that your DNS settings are incorrect. Please contact your hosting provider to confirm your origin IP and then make sure the correct IP is listed for your A record in your Cloudflare DNS Settings page.</span> <a rel="noopener noreferrer" href="https://support.cloudflare.com/hc/en-us/articles/200171946-Error-523">Additional troubleshooting information here.</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300">
+  <p class="text-13">
+    <span class="cf-footer-item sm:block sm:mb-1">Cloudflare Ray ID: <strong class="font-semibold">9324406cae2d851f</strong></span>
+    <span class="cf-footer-separator sm:hidden">&bull;</span>
+    <span id="cf-footer-item-ip" class="cf-footer-item hidden sm:block sm:mb-1">
+      Your IP:
+      <button type="button" id="cf-footer-ip-reveal" class="cf-footer-ip-reveal-btn">Click to reveal</button>
+      <span class="hidden" id="cf-footer-ip">35.244.11.37</span>
+      <span class="cf-footer-separator sm:hidden">&bull;</span>
+    </span>
+    <span class="cf-footer-item sm:block sm:mb-1"><span>Performance &amp; security by</span> <a rel="noopener noreferrer" href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" id="brand_link" target="_blank">Cloudflare</a></span>
+    
+  </p>
+  <script>(function(){function d(){var b=a.getElementById("cf-footer-item-ip"),c=a.getElementById("cf-footer-ip-reveal");b&&"classList"in b&&(b.classList.remove("hidden"),c.addEventListener("click",function(){c.classList.add("hidden");a.getElementById("cf-footer-ip").classList.remove("hidden")}))}var a=document;document.addEventListener&&a.addEventListener("DOMContentLoaded",d)})();</script>
+</div><!-- /.error-footer -->
+
+
+    </div>
+</div>
+</body>
+</html>
+Extracted 0 videos
+
+Extracting videos from: internal Luf-Mp4 (/apivtwo/clock?id=7d2473746a243c247573642b7a2b716772656e2972692b7f6973742b63726374686f727f2b373331363e3963763b3331323633242a2475727463676b63744f62243c2468756374706374242a2462677263243c24343634332b36322b373e5237343c32323c3636283636365c247b)
+
+Failed to get version endpoint: 523
+Response: <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!--<![endif]-->
+<head>
+
+
+<title>allanime.to | 523: Origin is unreachable</title>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" id="cf_styles-css" href="/cdn-cgi/styles/main.css" />
+
+
+</head>
+<body>
+<div id="cf-wrapper">
+    <div id="cf-error-details" class="p-0">
+        <header class="mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8">
+            <h1 class="inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2">
+              <span class="inline-block">Origin is unreachable</span>
+              <span class="code-label">Error code 523</span>
+            </h1>
+            <div>
+               Visit <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">cloudflare.com</a> for more information.
+            </div>
+            <div class="mt-3">2025-04-18 12:44:09 UTC</div>
+        </header>
+        <div class="my-8 bg-gradient-gray">
+            <div class="w-240 lg:w-full mx-auto">
+                <div class="clearfix md:px-8">
+                  
+<div id="cf-browser-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">You</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Browser
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-cloudflare-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    <span class="cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    </a>
+  </div>
+  <span class="md:block w-full truncate">Mumbai</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" target="_blank" rel="noopener noreferrer">
+    Cloudflare
+    </a>
+  </h3>
+  <span class="leading-1.3 text-2xl text-green-success">Working</span>
+</div>
+
+<div id="cf-host-status" class="cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left md:float-none text-center">
+  <div class="relative mb-10 md:m-0">
+    
+    <span class="cf-icon-server block md:hidden h-20 bg-center bg-no-repeat"></span>
+    <span class="cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+    
+  </div>
+  <span class="md:block w-full truncate">allanime.to</span>
+  <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+    
+    Host
+    
+  </h3>
+  <span class="leading-1.3 text-2xl text-red-error">Error</span>
+</div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="w-240 lg:w-full mx-auto mb-8 lg:px-8">
+            <div class="clearfix">
+                <div class="w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What happened?</h2>
+                    <p>The origin web server is not reachable.</p>
+                </div>
+                <div class="w-1/2 md:w-full float-left leading-relaxed">
+                    <h2 class="text-3xl font-normal leading-1.3 mb-4">What can I do?</h2>
+                          <h3 class="text-15 font-semibold mb-2">If you're a visitor of this website:</h3>
+      <p class="mb-6">Please try again in a few minutes.</p>
+
+      <h3 class="text-15 font-semibold mb-2">If you're the owner of this website:</h3>
+      <p><span>Check your DNS Settings. A 523 error means that Cloudflare could not reach your host web server. The most common cause is that your DNS settings are incorrect. Please contact your hosting provider to confirm your origin IP and then make sure the correct IP is listed for your A record in your Cloudflare DNS Settings page.</span> <a rel="noopener noreferrer" href="https://support.cloudflare.com/hc/en-us/articles/200171946-Error-523">Additional troubleshooting information here.</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300">
+  <p class="text-13">
+    <span class="cf-footer-item sm:block sm:mb-1">Cloudflare Ray ID: <strong class="font-semibold">93244080cb79851f</strong></span>
+    <span class="cf-footer-separator sm:hidden">&bull;</span>
+    <span id="cf-footer-item-ip" class="cf-footer-item hidden sm:block sm:mb-1">
+      Your IP:
+      <button type="button" id="cf-footer-ip-reveal" class="cf-footer-ip-reveal-btn">Click to reveal</button>
+      <span class="hidden" id="cf-footer-ip">35.244.11.37</span>
+      <span class="cf-footer-separator sm:hidden">&bull;</span>
+    </span>
+    <span class="cf-footer-item sm:block sm:mb-1"><span>Performance &amp; security by</span> <a rel="noopener noreferrer" href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_523&utm_campaign=allanime.to" id="brand_link" target="_blank">Cloudflare</a></span>
+    
+  </p>
+  <script>(function(){function d(){var b=a.getElementById("cf-footer-item-ip"),c=a.getElementById("cf-footer-ip-reveal");b&&"classList"in b&&(b.classList.remove("hidden"),c.addEventListener("click",function(){c.classList.add("hidden");a.getElementById("cf-footer-ip").classList.remove("hidden")}))}var a=document;document.addEventListener&&a.addEventListener("DOMContentLoaded",d)})();</script>
+</div><!-- /.error-footer -->
+
+
+    </div>
+</div>
+</body>
+</html>
+Extracted 0 videos
+
+Extracted 2 total videos
+
+Sorting videos with preferences:
+  Preferred server: site_default
+  Preferred quality: 1080
+  Preferred sub/dub: sub
+
+✅ Successfully found 2 video streams

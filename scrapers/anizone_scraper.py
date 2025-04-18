@@ -83,7 +83,7 @@ class AniZoneSearcher:
                     continue
 
                 if response.status_code != 200:
-                    print(f"❌ Search failed with status code: {response.status_code}")
+                    print(f"❌ Search failed with status code: {response.status_code} {response.text} {updates}")
                     time.sleep(2)
                     continue
 
