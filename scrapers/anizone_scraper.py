@@ -212,7 +212,7 @@ class AniZoneSearcher:
 
             # Get the thumbnail
             thumbnail = document.select_one("div.flex.items-start img")
-            thumbnail_url = thumbnail["src"] if thumbnail else None
+            thumbnail_url = thumbnail.get("src") if thumbnail else None
 
             if thumbnail_url and not thumbnail_url.startswith(('http://', 'https://')):
                 thumbnail_url = urllib.parse.urljoin(self.base_url, thumbnail_url)
