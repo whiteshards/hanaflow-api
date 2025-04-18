@@ -69,6 +69,11 @@ def main_menu():
                         all_anime_results = all_anime_searcher.search_anime(query)
                         all_results.extend(all_anime_results)
                         print(f"Found {len(all_anime_results)} results from AllAnime")
+                        
+                    if choice == '1' or choice == '5':
+                        hanime_results = hanime_searcher.search_anime(query)
+                        all_results.extend(hanime_results)
+                        print(f"Found {len(hanime_results)} results from Hanime")
 
                     if choice == '5':
                         # Hanime search submenu
@@ -84,8 +89,8 @@ def main_menu():
                         hanime_choice = input("\nEnter your choice (1-7): ")
 
                         if hanime_choice == '1':
-                            search_query = input("Enter search query for Hanime: ")
-                            results = hanime_searcher.search_anime(search_query)
+                            # Use the already entered search query instead of asking again
+                            results = hanime_searcher.search_anime(query)
                             all_results = results 
                             source = 'hanime'
                         elif hanime_choice == '2':
