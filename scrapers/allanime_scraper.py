@@ -370,6 +370,7 @@ query ($showId: String!, $translationType: VaildTranslationType!, $episodeString
 
             if response.status_code == 400:
                  print(f"❌ AllAnime search failed (400 Bad Request). Payload: {json.dumps(data)}")
+                 with open("error.txt", "w") as n: n.write(str(data))
                  print(f"Response Text: {response.text[:500]}") # Print beginning of error response
                  return []
             response.raise_for_status() # Raise an exception for other bad status codes
@@ -386,6 +387,8 @@ query ($showId: String!, $translationType: VaildTranslationType!, $episodeString
             print("❌ AllAnime search request timed out.")
         except requests.exceptions.RequestException as e:
             print(f"❌ AllAnime search failed: {e}")
+            with open("error.txt", "w") as ne:
+                ne.write(str(e))
             # Print response body if available for debugging
             if e.response is not None:
                 print(f"Response status: {e.response.status_code}")
