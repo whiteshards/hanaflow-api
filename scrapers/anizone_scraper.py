@@ -1,3 +1,4 @@
+
 import requests
 import json
 import re
@@ -51,23 +52,18 @@ class AniZoneSearcher:
             self.snapshots["anime_snapshot_key"] = ""
             self.token = ""  # Reset token too to ensure fresh session
 
-            # Prepare updates and calls for request
-            # Structure the updates like the Kotlin implementation
-            updates = {
-                "data": {
-                    "anime": [None, {"class": "anime", "key": 68, "s": "mdl"}],
-                    "title": None,
+            # Prepare updates for request similar to Kotlin implementation
+            updates = {}
+            if query:
+                updates = {
                     "search": query,
-                    "listSize": 1104,
-                    "sort": "title-asc",
-                    "sortOptions": [
-                        {"release-asc": "First Aired", "release-desc": "Last Aired"}, 
-                        {"s": "arr"}
-                    ],
-                    "view": "list",
-                    "paginators": [{"page": 1}, {"s": "arr"}]
+                    "sort": "title-asc"  # Default sort
                 }
-            }
+            else:
+                updates = {
+                    "sort": "title-asc"  # Just sort if no query
+                }
+            
             calls = []
 
             # Try to make the request with retries
@@ -83,7 +79,15 @@ class AniZoneSearcher:
                     continue
 
                 if response.status_code != 200:
-                    print(f"❌ Search failed with status code: {response.status_code} {response.text} {updates}")
+                    print(f"❌ Search failed with status code: {response.status_code}")
+                    with open("error.txt", "w") as f:
+                        f.write(f"Status code: {response.status_code}\n")
+                        f.write(f"Response: {response.text[:1000]}\n")
+                        f.write(f"Request URL: {self.base_url}/livewire/update\n")
+                        f.write(f"Updates: {json.dumps(updates)}\n")
+                        f.write(f"Calls: {json.dumps(calls)}\n")
+                        f.write(f"Snapshot: {self.snapshots['anime_snapshot_key'][:200]}\n")
+                        f.write(f"Token: {self.token}\n")
                     time.sleep(2)
                     continue
 
@@ -185,6 +189,9 @@ class AniZoneSearcher:
             print(f"❌ AniZone search failed: {e}")
             import traceback
             print(traceback.format_exc())
+            with open("error.txt", "a") as f:
+                f.write(f"Search error: {str(e)}\n")
+                f.write(traceback.format_exc())
             return []
 
     def get_anime_details(self, url):
@@ -800,25 +807,7 @@ class AniZoneSearcher:
         request_headers['Content-Type'] = "application/json"
         request_headers['X-CSRF-TOKEN'] = self.token
 
-        # Prepare the request body - Properly merge snapshot if available
-        if 'data' in updates and self.snapshots[map_key]:
-            try:
-                # Try to parse existing snapshot JSON and merge with updates
-                snapshot_json = json.loads(self.snapshots[map_key])
-                # Only merge data fields if snapshot has data
-                if 'data' in snapshot_json:
-                    # Keep provided updates fields, but fill missing ones from snapshot
-                    # Remove any problematic escape sequences in the process
-                    for key, value in snapshot_json['data'].items():
-                        if key not in updates['data']:
-                            # Clean string values to avoid escape sequence issues
-                            if isinstance(value, str):
-                                # Replace literal escape sequences with their proper characters
-                                value = value.replace('\\n', '\n').replace('\\r', '\r').replace('\\t', '\t')
-                            updates['data'][key] = value
-            except json.JSONDecodeError:
-                print(f"⚠️ Warning: Could not parse snapshot JSON for merging")
-
+        # Prepare the request body - Following Kotlin implementation more closely
         request_body = {
             "_token": self.token,
             "components": [
@@ -830,12 +819,6 @@ class AniZoneSearcher:
             ]
         }
 
-        if not self.snapshots[map_key]:
-            print(f"⚠️ Warning: Empty snapshot for key '{map_key}'")
-
-        if not self.token:
-            print(f"⚠️ Warning: Empty CSRF token")
-
         # Make the request
         try:
             # Fix URL construction by ensuring no double URL parts
@@ -844,8 +827,7 @@ class AniZoneSearcher:
                 livewire_url = f"{self.base_url}livewire/update"
 
             print(f"🔄 Sending Livewire request to: {livewire_url}")
-            print(f"Request body: {json.dumps(request_body)[:200]}...")
-
+            
             response = self.session.post(
                 livewire_url,
                 headers=request_headers,
@@ -853,43 +835,42 @@ class AniZoneSearcher:
                 timeout=15
             )
 
-            if response.status_code != 200:
-                print(f"❌ Response status code: {response.status_code}")
-                try:
-                    print(f"Response text preview: {response.text[:500]}")
-                except:
-                    print("Could not print response text")
-
             # Handle 500 errors gracefully
             if response.status_code == 500:
-                print(f"❌ Server error (500) from AniZone. Attempting to recover...")
-
+                print(f"❌ Server error (500) from AniZone.")
+                with open("error.txt", "w") as f:
+                    f.write(f"Error 500 Livewire request\n")
+                    f.write(f"URL: {livewire_url}\n")
+                    f.write(f"Headers: {request_headers}\n")
+                    f.write(f"Request Body: {json.dumps(request_body)[:1000]}\n")
+                    if response.text:
+                        f.write(f"Response: {response.text[:1000]}\n")
+                
                 # Retry with fresh token and snapshot
+                print("🔄 Attempting to recover with fresh credentials...")
                 self.token = ""
                 self.snapshots[map_key] = ""
-
-                # Get a fresh page with properly constructed URL
+                
+                # Get a fresh page
                 retry_url = f"{self.base_url}{initial_slug}"
-                print(f"🔄 Attempting to recover with URL: {retry_url}")
                 retry_response = self.session.get(retry_url, headers=self.headers)
+                
                 if retry_response.status_code == 200:
                     retry_document = BeautifulSoup(retry_response.text, 'html.parser')
-
-                    # Get fresh snapshot
                     self.snapshots[map_key] = self.get_snapshot_from_document(retry_document)
-
-                    # Get fresh token
-                    retry_token_script = retry_document.select_one('script[data-csrf]')
-                    if retry_token_script and 'data-csrf' in retry_token_script.attrs:
-                        self.token = retry_token_script['data-csrf']
-
-                        # Try the request again with fresh credentials
+                    
+                    token_script = retry_document.select_one('script[data-csrf]')
+                    if token_script and 'data-csrf' in token_script.attrs:
+                        self.token = token_script['data-csrf']
+                        
+                        # Try again with fresh credentials
                         request_headers['X-CSRF-TOKEN'] = self.token
                         request_body["_token"] = self.token
                         request_body["components"][0]["snapshot"] = self.snapshots[map_key]
-
+                        
+                        print("🔄 Retrying request with fresh credentials...")
                         response = self.session.post(
-                            f"{self.base_url}/livewire/update",
+                            livewire_url,
                             headers=request_headers,
                             json=request_body,
                             timeout=15
