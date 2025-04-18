@@ -499,7 +499,9 @@ class AllAnimeScraper:
             print("❌ AllAnime episodes request timed out.")
             return []
         except requests.exceptions.RequestException as e:
-            print(f"❌ Failed to get episodes from AllAnime: {e}")
+            print(f"❌ Failed to get episodes from AllAnime: {e} payload: {data} response: {response.text}")
+            with open("error.txt", "w") as n: n.write("Payload: " + str(data)); n.write("\nRespone Text:" + str(response.text))
+            
             return []
         except json.JSONDecodeError:
             print("❌ Failed to parse JSON response from AllAnime episodes.")
