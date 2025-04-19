@@ -13,7 +13,7 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python cli.py"
+args = "python -m uvicorn main:app --host 0.0.0.0 --port 5000 --reload"
 
 [[ports]]
 localPort = 8000

@@ -38,7 +38,7 @@ class MangaResponse(BaseModel):
     page: int
     limit: int
     source: str
-    query: str
+    query: Optional[str] = None
     results: List[Dict[str, Any]]
     executionTimeMs: int
 
@@ -105,6 +105,94 @@ async def search_manga(
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error searching manga: {str(e)}")
+
+@app.get("/api/manga/popular", response_model=MangaResponse)
+async def get_popular_manga(
+    source: str = Query(..., description="Source to fetch from (comick, nhentai)"),
+    page: Optional[int] = Query(1, description="Page number", ge=1),
+    limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
+):
+    start_time = time.time()
+    
+    # Validate source
+    if source not in scrapers:
+        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(scrapers.keys())}")
+    
+    # Get the appropriate scraper
+    scraper = scrapers[source]
+    
+    try:
+        # Get popular manga
+        results = scraper.get_popular_manga()
+        
+        # Add source to each result
+        for result in results:
+            result["source"] = source
+        
+        # Paginate results
+        paginated_results = paginate_results(results, page, limit)
+        
+        # Calculate execution time
+        execution_time_ms = int((time.time() - start_time) * 1000)
+        
+        # Prepare response
+        response = {
+            "totalResults": len(results),
+            "page": page,
+            "limit": limit,
+            "source": source,
+            "results": paginated_results,
+            "executionTimeMs": execution_time_ms
+        }
+        
+        return response
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching popular manga: {str(e)}")
+
+@app.get("/api/manga/latest", response_model=MangaResponse)
+async def get_latest_manga(
+    source: str = Query(..., description="Source to fetch from (comick, nhentai)"),
+    page: Optional[int] = Query(1, description="Page number", ge=1),
+    limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
+):
+    start_time = time.time()
+    
+    # Validate source
+    if source not in scrapers:
+        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(scrapers.keys())}")
+    
+    # Get the appropriate scraper
+    scraper = scrapers[source]
+    
+    try:
+        # Get latest manga
+        results = scraper.get_latest_manga()
+        
+        # Add source to each result
+        for result in results:
+            result["source"] = source
+        
+        # Paginate results
+        paginated_results = paginate_results(results, page, limit)
+        
+        # Calculate execution time
+        execution_time_ms = int((time.time() - start_time) * 1000)
+        
+        # Prepare response
+        response = {
+            "totalResults": len(results),
+            "page": page,
+            "limit": limit,
+            "source": source,
+            "results": paginated_results,
+            "executionTimeMs": execution_time_ms
+        }
+        
+        return response
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching latest manga: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
