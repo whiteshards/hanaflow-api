@@ -166,7 +166,7 @@ class NHentaiScraper:
                 manga_id = relative_url.split("/")[-2] if relative_url else ""
                 
                 # Get the title
-                title_element = element.select_one("a > div.caption")
+                title_element = element.select_one(".caption")
                 title = title_element.text.strip() if title_element else "Unknown Title"
                 
                 # Get thumbnail
