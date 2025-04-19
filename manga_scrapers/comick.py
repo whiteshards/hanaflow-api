@@ -457,7 +457,10 @@ class ComickScraper:
         """Get pages for a chapter."""
         print(f"🔍 Getting pages for chapter: {chapter.get('name', chapter.get('url', 'Unknown'))}")
         
-        chapter_hid = chapter["url"].split("/")[-1].split("-")[0]
+        if chapter.get('url'):
+            chapter_hid = chapter["url"].split("/")[-1].split("-")[0]
+        else:
+            chapter_hid = chapter
         url = f"{self.API_URL}/chapter/{chapter_hid}"
         params = {"tachiyomi": "true"}
         
