@@ -13,6 +13,7 @@ from scrapers.hahomoe_scraper import HahoMoeSearcher
 from scrapers.anizone_scraper import AniZoneSearcher
 from scrapers.allanime_scraper import AllAnimeScraper
 from scrapers.hanime_scraper import HanimeScraper # Added Hanime scraper import
+from manga_scrapers.comick import ComickScraper # Added ComickScraper import
 
 
 def main_menu():
@@ -21,6 +22,7 @@ def main_menu():
     ani_zone_searcher = AniZoneSearcher()
     all_anime_searcher = AllAnimeScraper()
     hanime_searcher = HanimeScraper() # Added Hanime scraper initialization
+    comick_searcher = ComickScraper() # Added ComickScraper initialization
 
     print("""
         ####################################
@@ -36,14 +38,15 @@ def main_menu():
         print("3. Search on AniZone only")
         print("4. Search on AllAnime only")
         print("5. Search on Hanime only") # Added Hanime search option
-        print("6. Set Hanime Quality Preference") # Added Hanime quality setting option
-        print("7. Exit") # Updated exit option number
+        print("6. Search manga on Comick") # Added Comick manga search option
+        print("7. Set Hanime Quality Preference") # Added Hanime quality setting option
+        print("8. Exit") # Updated exit option number
 
         try:
-            choice = input("\nEnter your choice (1-7): ") # Updated choice range
+            choice = input("\nEnter your choice (1-8): ") # Updated choice range
 
-            if choice in ['1', '2', '3', '4', '5', '6', '7']:
-                if choice == '7':
+            if choice in ['1', '2', '3', '4', '5', '6', '7', '8']:
+                if choice == '8':
                     print("Exiting...")
                     break
 
@@ -381,6 +384,146 @@ def main_menu():
                             # Continue to anime selection menu on error
                             continue # Added continue
                 elif choice == '6':
+                    # Comick Manga search
+                    query = input("\nEnter manga title to search: ")
+                    if not query.strip():
+                        print("Please enter a valid search term.")
+                        continue
+                    
+                    print(f"\n🔍 Searching for '{query}' on Comick...")
+                    manga_results = comick_searcher.search_manga(query)
+                    
+                    if not manga_results:
+                        print("No results found. Try a different search term.")
+                        continue
+                    
+                    # Display search results
+                    print(f"\nFound {len(manga_results)} manga results:")
+                    for i, manga in enumerate(manga_results, 1):
+                        title = manga.get('title', 'Unknown Title')
+                        print(f"{i}. {title}")
+                    
+                    # Let user select a manga
+                    while True:
+                        try:
+                            selection = input("\nEnter the number of the manga to view details (or 0 to go back): ")
+                            if selection == '0':
+                                break
+                            
+                            selection_idx = int(selection) - 1
+                            if 0 <= selection_idx < len(manga_results):
+                                selected_manga = manga_results[selection_idx]
+                                
+                                # Get manga details
+                                print(f"\nFetching details for {selected_manga.get('title', 'Unknown Title')}...")
+                                manga_details = comick_searcher.get_manga_details(selected_manga.get('slug', ''))
+                                
+                                if manga_details:
+                                    # Display manga details
+                                    print(f"\n{'=' * 50}")
+                                    print(f"Manga Details: {manga_details.get('title', 'Unknown Title')} [Comick]")
+                                    print(f"{'=' * 50}")
+                                    
+                                    # Display cover
+                                    if 'cover_url' in manga_details and manga_details['cover_url']:
+                                        print(f"\nCover URL: {manga_details['cover_url']}")
+                                    
+                                    # Display description
+                                    if 'description' in manga_details and manga_details['description']:
+                                        print(f"\nDescription:")
+                                        display_description = manga_details['description']
+                                        if len(display_description) > 300:
+                                            display_description = display_description[:300] + "..."
+                                        print(display_description)
+                                    
+                                    # Display additional info
+                                    if 'info' in manga_details and manga_details['info']:
+                                        print("\nAdditional Information:")
+                                        for key, value in manga_details['info'].items():
+                                            print(f"   {key}: {value}")
+                                    
+                                    # Display genres if available
+                                    if 'genres' in manga_details and manga_details['genres']:
+                                        print(f"\nGenres: {', '.join(manga_details['genres'])}")
+                                    
+                                    print(f"{'=' * 50}")
+                                    
+                                    # Get chapters
+                                    print(f"\nFetching chapters...")
+                                    chapters = comick_searcher.get_chapters(selected_manga.get('slug', ''))
+                                    
+                                    if not chapters:
+                                        print("No chapters found for this manga.")
+                                        continue
+                                    
+                                    # Display chapters
+                                    print(f"\nFound {len(chapters)} chapters:")
+                                    
+                                    # Calculate how many chapters to show initially
+                                    chapter_limit = 10
+                                    limited_display = len(chapters) > chapter_limit
+                                    display_chapters = chapters[:chapter_limit] if limited_display else chapters
+                                    
+                                    for i, chapter in enumerate(display_chapters, 1):
+                                        print(f"{i}. {chapter.get('title', f'Chapter {chapter.get('chapter_number', i)}')}")
+                                    
+                                    if limited_display:
+                                        print(f"...and {len(chapters) - chapter_limit} more chapters.")
+                                    
+                                    # Let user select a chapter
+                                    while True:
+                                        try:
+                                            ch_selection = input("\nEnter the number of the chapter to view pages (or 0 to go back, or 'all' to see all chapters): ")
+                                            
+                                            if ch_selection.lower() == 'all':
+                                                # Show all chapters
+                                                print(f"\nShowing all {len(chapters)} chapters:")
+                                                for i, chapter in enumerate(chapters, 1):
+                                                    print(f"{i}. {chapter.get('title', f'Chapter {chapter.get('chapter_number', i)}')}")
+                                                continue
+                                            
+                                            if ch_selection == '0':
+                                                break
+                                            
+                                            ch_idx = int(ch_selection) - 1
+                                            if 0 <= ch_idx < len(chapters):
+                                                selected_chapter = chapters[ch_idx]
+                                                
+                                                # Get chapter pages
+                                                print(f"\nFetching pages for {selected_chapter.get('title', f'Chapter {selected_chapter.get('chapter_number', ch_idx+1)}')}...")
+                                                pages = comick_searcher.get_pages(selected_chapter.get('id', ''))
+                                                
+                                                if not pages:
+                                                    print("No pages found for this chapter.")
+                                                    continue
+                                                
+                                                # Display page info
+                                                print(f"\nFound {len(pages)} pages.")
+                                                print("Page URLs have been saved to urls.txt")
+                                                
+                                                # Write page URLs to file
+                                                with open('urls.txt', 'a') as url_file:
+                                                    url_file.write(f"\n==== Comick: {manga_details.get('title', 'Unknown Manga')} - {selected_chapter.get('title', f'Chapter {selected_chapter.get('chapter_number', ch_idx+1)}')} ====\n")
+                                                    for i, page in enumerate(pages, 1):
+                                                        url_file.write(f"Page {i}: {page.get('url', 'No URL')}\n")
+                                            else:
+                                                print("Invalid chapter number. Please try again.")
+                                        except ValueError:
+                                            print("Please enter a valid number.")
+                                        except Exception as e:
+                                            print(f"An error occurred while fetching/displaying pages: {e}")
+                                            continue
+                                else:
+                                    print("Failed to get manga details.")
+                            else:
+                                print("Invalid selection. Please try again.")
+                        except ValueError:
+                            print("Please enter a valid number.")
+                        except Exception as e:
+                            print(f"An error occurred while selecting manga: {e}")
+                            continue
+                
+                elif choice == '7':
                     try:
                         quality = input("Enter desired Hanime quality (e.g., 720p, 1080p): ")
                         hanime_searcher.set_quality(quality)
@@ -388,7 +531,7 @@ def main_menu():
                     except Exception as e:
                         print(f"Error setting Hanime quality: {e}")
             else:
-                print("Invalid choice. Please enter a number between 1 and 7.") # Updated range
+                print("Invalid choice. Please enter a number between 1 and 8.") # Updated range
         except Exception as e:
             print(f"An error occurred in the main loop: {e}")
             continue
