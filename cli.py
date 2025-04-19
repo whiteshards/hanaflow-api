@@ -14,6 +14,7 @@ from scrapers.anizone_scraper import AniZoneSearcher
 from scrapers.allanime_scraper import AllAnimeScraper
 from scrapers.hanime_scraper import HanimeScraper # Added Hanime scraper import
 from manga_scrapers.comick import ComickScraper # Added ComickScraper import
+from manga_scrapers.nhentai import NHentaiScraper # Added NHentaiScraper import
 
 
 def main_menu():
@@ -23,6 +24,7 @@ def main_menu():
     all_anime_searcher = AllAnimeScraper()
     hanime_searcher = HanimeScraper() # Added Hanime scraper initialization
     comick_searcher = ComickScraper() # Added ComickScraper initialization
+    nhentai_searcher = NHentaiScraper() # Added NHentai scraper initialization
 
     print("""
         ####################################
@@ -39,14 +41,15 @@ def main_menu():
         print("4. Search on AllAnime only")
         print("5. Search on Hanime only") # Added Hanime search option
         print("6. Search manga on Comick") # Added Comick manga search option
-        print("7. Set Hanime Quality Preference") # Added Hanime quality setting option
-        print("8. Exit") # Updated exit option number
+        print("7. Search manga on NHentai") # Added NHentai search option
+        print("8. Set Hanime Quality Preference") # Added Hanime quality setting option
+        print("9. Exit") # Updated exit option number
 
         try:
-            choice = input("\nEnter your choice (1-8): ") # Updated choice range
+            choice = input("\nEnter your choice (1-9): ") # Updated choice range
 
-            if choice in ['1', '2', '3', '4', '5', '6', '7', '8']:
-                if choice == '8':
+            if choice in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                if choice == '9':
                     print("Exiting...")
                     break
 
@@ -524,6 +527,217 @@ def main_menu():
                             continue
                 
                 elif choice == '7':
+                    # NHentai manga search
+                    query = input("\nEnter manga title to search (or ID with 'id:' prefix): ")
+                    if not query.strip():
+                        print("Please enter a valid search term.")
+                        continue
+                    
+                    print(f"\n🔍 Searching for '{query}' on NHentai...")
+                    
+                    # Check for submenus
+                    if query.lower() == "menu":
+                        print("\nNHentai Search Options:")
+                        print("1. Basic Search")
+                        print("2. Popular Galleries")
+                        print("3. Latest Galleries")
+                        print("4. Advanced Search (with filters)")
+                        print("5. Go Back")
+                        
+                        nh_choice = input("\nEnter your choice (1-5): ")
+                        
+                        if nh_choice == '1':
+                            query = input("\nEnter manga title to search: ")
+                            if not query.strip():
+                                print("Please enter a valid search term.")
+                                continue
+                            manga_results = nhentai_searcher.search_manga(query)
+                        elif nh_choice == '2':
+                            manga_results = nhentai_searcher.get_popular_manga()
+                        elif nh_choice == '3':
+                            manga_results = nhentai_searcher.get_latest_manga()
+                        elif nh_choice == '4':
+                            # Advanced search setup
+                            print("\nAdvanced Search")
+                            query = input("Enter basic search term (or blank): ")
+                            
+                            # Get filter values
+                            filters = {}
+                            
+                            # Tags
+                            tags = input("Enter tags (comma separated, prefix with - to exclude): ")
+                            if tags.strip():
+                                filters["tag"] = tags
+                            
+                            # Categories
+                            categories = input("Enter categories (e.g., doujinshi, manga): ")
+                            if categories.strip():
+                                filters["category"] = categories
+                            
+                            # Artists
+                            artists = input("Enter artists: ")
+                            if artists.strip():
+                                filters["artist"] = artists
+                            
+                            # Groups
+                            groups = input("Enter groups: ")
+                            if groups.strip():
+                                filters["group"] = groups
+                            
+                            # Parodies
+                            parodies = input("Enter parodies: ")
+                            if parodies.strip():
+                                filters["parody"] = parodies
+                            
+                            # Characters
+                            characters = input("Enter characters: ")
+                            if characters.strip():
+                                filters["character"] = characters
+                            
+                            # Pages filter
+                            pages = input("Enter pages filter (e.g. >20, <50, 25): ")
+                            if pages.strip():
+                                filters["pages"] = pages
+                            
+                            # Sort
+                            print("\nSort options:")
+                            print("1. Recent")
+                            print("2. Popular (All Time)")
+                            print("3. Popular (This Month)")
+                            print("4. Popular (This Week)")
+                            print("5. Popular (Today)")
+                            
+                            sort_choice = input("Select sort option (1-5): ")
+                            sort_map = {
+                                "1": "date",
+                                "2": "popular",
+                                "3": "popular-month",
+                                "4": "popular-week",
+                                "5": "popular-today"
+                            }
+                            
+                            if sort_choice in sort_map:
+                                filters["sort"] = sort_map[sort_choice]
+                            
+                            # Search with filters
+                            manga_results = nhentai_searcher.search_manga(query, 1, filters)
+                        elif nh_choice == '5':
+                            continue
+                        else:
+                            print("Invalid choice.")
+                            continue
+                    else:
+                        manga_results = nhentai_searcher.search_manga(query)
+                    
+                    if not manga_results:
+                        print("No results found. Try a different search term.")
+                        continue
+                    
+                    # Display search results
+                    print(f"\nFound {len(manga_results)} manga results:")
+                    for i, manga in enumerate(manga_results, 1):
+                        title = manga.get('title', 'Unknown Title')
+                        print(f"{i}. {title}")
+                    
+                    # Let user select a manga
+                    while True:
+                        try:
+                            selection = input("\nEnter the number of the manga to view details (or 0 to go back): ")
+                            if selection == '0':
+                                break
+                            
+                            selection_idx = int(selection) - 1
+                            if 0 <= selection_idx < len(manga_results):
+                                selected_manga = manga_results[selection_idx]
+                                
+                                # Get manga details
+                                print(f"\nFetching details for {selected_manga.get('title', 'Unknown Title')}...")
+                                manga_details = nhentai_searcher.get_manga_details(selected_manga)
+                                
+                                if manga_details:
+                                    # Display manga details
+                                    print(f"\n{'=' * 50}")
+                                    print(f"Manga Details: {manga_details.get('title', 'Unknown Title')} [NHentai]")
+                                    print(f"{'=' * 50}")
+                                    
+                                    # Display cover
+                                    if 'cover_url' in manga_details and manga_details['cover_url']:
+                                        print(f"\nCover URL: {manga_details['cover_url']}")
+                                    
+                                    # Display description
+                                    if 'description' in manga_details and manga_details['description']:
+                                        print(f"\nDescription:")
+                                        print(manga_details['description'])
+                                    
+                                    # Display additional info
+                                    print("\nAdditional Information:")
+                                    if manga_details.get('artist'):
+                                        print(f"   Artist: {manga_details['artist']}")
+                                    if manga_details.get('groups'):
+                                        print(f"   Groups: {manga_details['groups']}")
+                                    if manga_details.get('pages'):
+                                        print(f"   Pages: {manga_details['pages']}")
+                                    
+                                    # Display genres if available
+                                    if 'genres' in manga_details and manga_details['genres']:
+                                        print(f"\nTags: {manga_details['genres']}")
+                                    
+                                    print(f"{'=' * 50}")
+                                    
+                                    # Get chapters (single chapter for doujins)
+                                    print(f"\nFetching chapters...")
+                                    chapters = nhentai_searcher.get_chapters(manga_details)
+                                    
+                                    if not chapters:
+                                        print("No chapters found for this manga.")
+                                        continue
+                                    
+                                    # Display chapters
+                                    print(f"\nFound {len(chapters)} chapter(s):")
+                                    for i, chapter in enumerate(chapters, 1):
+                                        print(f"{i}. {chapter.get('title', f'Chapter {i}')}")
+                                    
+                                    # Let user select a chapter
+                                    while True:
+                                        try:
+                                            ch_selection = input("\nEnter the number of the chapter to view pages (or 0 to go back): ")
+                                            
+                                            if ch_selection == '0':
+                                                break
+                                            
+                                            ch_idx = int(ch_selection) - 1
+                                            if 0 <= ch_idx < len(chapters):
+                                                selected_chapter = chapters[ch_idx]
+                                                
+                                                # Get chapter pages
+                                                print(f"\nFetching pages for chapter...")
+                                                pages = nhentai_searcher.get_pages(selected_chapter)
+                                                
+                                                if not pages:
+                                                    print("No pages found for this chapter.")
+                                                    continue
+                                                
+                                                # Display page info
+                                                print(f"\nFound {len(pages)} pages.")
+                                                print("Page URLs have been saved to urls.txt")
+                                            else:
+                                                print("Invalid chapter number. Please try again.")
+                                        except ValueError:
+                                            print("Please enter a valid number.")
+                                        except Exception as e:
+                                            print(f"An error occurred while fetching/displaying pages: {e}")
+                                            continue
+                                else:
+                                    print("Failed to get manga details.")
+                            else:
+                                print("Invalid selection. Please try again.")
+                        except ValueError:
+                            print("Please enter a valid number.")
+                        except Exception as e:
+                            print(f"An error occurred while selecting manga: {e}")
+                            continue
+                
+                elif choice == '8':
                     try:
                         quality = input("Enter desired Hanime quality (e.g., 720p, 1080p): ")
                         hanime_searcher.set_quality(quality)
@@ -531,7 +745,7 @@ def main_menu():
                     except Exception as e:
                         print(f"Error setting Hanime quality: {e}")
             else:
-                print("Invalid choice. Please enter a number between 1 and 8.") # Updated range
+                print("Invalid choice. Please enter a number between 1 and 9.") # Updated range
         except Exception as e:
             print(f"An error occurred in the main loop: {e}")
             continue
