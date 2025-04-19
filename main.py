@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, HTTPException, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any, List, Optional
@@ -46,10 +45,10 @@ def paginate_results(results: List[Dict[str, Any]], page: int, limit: int) -> Li
     """Paginate results based on page and limit parameters."""
     start_idx = (page - 1) * limit
     end_idx = start_idx + limit
-    
+
     if start_idx >= len(results):
         return []
-    
+
     return results[start_idx:end_idx]
 
 @app.get("/")
@@ -68,28 +67,28 @@ async def search_manga(
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
     start_time = time.time()
-    
+
     # Validate source
     if source not in scrapers:
         raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(scrapers.keys())}")
-    
+
     # Get the appropriate scraper
     scraper = scrapers[source]
-    
+
     try:
         # Search manga
         results = scraper.search_manga(q)
-        
+
         # Add source to each result
         for result in results:
             result["source"] = source
-        
+
         # Paginate results
         paginated_results = paginate_results(results, page, limit)
-        
+
         # Calculate execution time
         execution_time_ms = int((time.time() - start_time) * 1000)
-        
+
         # Prepare response
         response = {
             "totalResults": len(results),
@@ -100,9 +99,9 @@ async def search_manga(
             "results": paginated_results,
             "executionTimeMs": execution_time_ms
         }
-        
+
         return response
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error searching manga: {str(e)}")
 
@@ -113,28 +112,28 @@ async def get_popular_manga(
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
     start_time = time.time()
-    
+
     # Validate source
     if source not in scrapers:
         raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(scrapers.keys())}")
-    
+
     # Get the appropriate scraper
     scraper = scrapers[source]
-    
+
     try:
         # Get popular manga
         results = scraper.get_popular_manga()
-        
+
         # Add source to each result
         for result in results:
             result["source"] = source
-        
+
         # Paginate results
         paginated_results = paginate_results(results, page, limit)
-        
+
         # Calculate execution time
         execution_time_ms = int((time.time() - start_time) * 1000)
-        
+
         # Prepare response
         response = {
             "totalResults": len(results),
@@ -144,9 +143,9 @@ async def get_popular_manga(
             "results": paginated_results,
             "executionTimeMs": execution_time_ms
         }
-        
+
         return response
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching popular manga: {str(e)}")
 
@@ -157,28 +156,28 @@ async def get_latest_manga(
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
     start_time = time.time()
-    
+
     # Validate source
     if source not in scrapers:
         raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(scrapers.keys())}")
-    
+
     # Get the appropriate scraper
     scraper = scrapers[source]
-    
+
     try:
         # Get latest manga
         results = scraper.get_latest_manga()
-        
+
         # Add source to each result
         for result in results:
             result["source"] = source
-        
+
         # Paginate results
         paginated_results = paginate_results(results, page, limit)
-        
+
         # Calculate execution time
         execution_time_ms = int((time.time() - start_time) * 1000)
-        
+
         # Prepare response
         response = {
             "totalResults": len(results),
@@ -188,11 +187,51 @@ async def get_latest_manga(
             "results": paginated_results,
             "executionTimeMs": execution_time_ms
         }
-        
+
         return response
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching latest manga: {str(e)}")
+
+@app.get("/details")
+async def get_details(
+    source: str,
+    id: str
+):
+    """
+    Get detailed information about a manga/anime by ID from specified source
+
+    - **source**: Source name (nhentai, comick, etc.)
+    - **id**: ID of the manga/anime
+    """
+    try:
+        if source == "nhentai":
+            scraper = NHentaiScraper()
+            manga = {"id": id, "url": f"/g/{id}/"}
+            details = scraper.get_manga_details(manga)
+
+            # Get chapter information
+            chapters = scraper.get_chapters(details)
+            details["chapters"] = chapters
+
+            return details
+
+        elif source == "comick":
+            scraper = ComickScraper()
+            manga = {"id": id, "url": f"/comic/{id}#"}
+            details = scraper.get_manga_details(manga)
+
+            # Get chapter information
+            chapters = scraper.get_chapters(details)
+            details["chapters"] = chapters
+
+            return details
+
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown source: {source}")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting details: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
