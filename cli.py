@@ -450,7 +450,7 @@ def main_menu():
                                     
                                     # Get chapters
                                     print(f"\nFetching chapters...")
-                                    chapters = comick_searcher.get_chapters(selected_manga.get('slug', ''))
+                                    chapters = comick_searcher.get_chapters(manga_details)
                                     
                                     if not chapters:
                                         print("No chapters found for this manga.")
