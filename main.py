@@ -290,9 +290,10 @@ async def get_manga_pages(
             
             # Handle chapter pages request
             if chapter_id:
-                # Direct chapter request
-                chapter = {"id": chapter_id, "url": f"/comic/{id}/{chapter_id}-chapter-1-en"}
-                pages = scraper.get_pages(chapter)
+                # Direct chapter request - just pass the chapter_id directly
+                # The Comick scraper extracts the chapter HID from this
+                print(f"Getting Comick pages for chapter_id: {chapter_id}")
+                pages = scraper.get_pages(chapter_id)
             else:
                 # Get manga details first
                 manga = {"id": id, "url": f"/comic/{id}#"}
@@ -304,6 +305,7 @@ async def get_manga_pages(
                     raise HTTPException(status_code=404, detail="No chapters found for this manga")
                 
                 # Get pages for first chapter
+                print(f"Getting Comick pages for first chapter: {chapters[0]['id']}")
                 pages = scraper.get_pages(chapters[0])
             
             # Calculate execution time
