@@ -236,3 +236,93 @@ async def get_details(
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
+
+
+@app.get("/api/manga/get-pages")
+async def get_manga_pages(
+    source: str = Query(..., description="Source to fetch from (comick, nhentai)"),
+    id: str = Query(..., description="ID or chapter ID of the manga"),
+    chapter_id: Optional[str] = Query(None, description="Chapter ID for multi-chapter manga (optional)")
+):
+    """
+    Get pages for a specific manga or chapter
+    
+    - **source**: Source name (nhentai, comick, etc.)
+    - **id**: ID of the manga
+    - **chapter_id**: Optional chapter ID for multi-chapter manga
+    """
+    start_time = time.time()
+    
+    try:
+        if source == "nhentai":
+            scraper = NHentaiScraper()
+            
+            # Create a manga/chapter object with minimal info needed for the scraper
+            if chapter_id:
+                # Use chapter_id if provided
+                chapter = {"id": chapter_id, "url": f"/g/{chapter_id}/"}
+                pages = scraper.get_pages(chapter)
+            else:
+                # Otherwise, get the manga first, then its chapters, then pages of first chapter
+                manga = {"id": id, "url": f"/g/{id}/"}
+                details = scraper.get_manga_details(manga)
+                chapters = scraper.get_chapters(details)
+                
+                if not chapters:
+                    raise HTTPException(status_code=404, detail="No chapters found for this manga")
+                    
+                pages = scraper.get_pages(chapters[0])
+            
+            # Calculate execution time
+            execution_time_ms = int((time.time() - start_time) * 1000)
+            
+            # Return pages with full URLs
+            return {
+                "source": source,
+                "manga_id": id,
+                "chapter_id": chapter_id or (chapters[0]["id"] if 'chapters' in locals() else id),
+                "pages": pages,
+                "executionTimeMs": execution_time_ms
+            }
+            
+        elif source == "comick":
+            scraper = ComickScraper()
+            
+            # Handle chapter pages request
+            if chapter_id:
+                # Direct chapter request
+                chapter = {"id": chapter_id, "url": f"/comic/{id}/{chapter_id}-chapter-1-en"}
+                pages = scraper.get_pages(chapter)
+            else:
+                # Get manga details first
+                manga = {"id": id, "url": f"/comic/{id}#"}
+                details = scraper.get_manga_details(manga)
+                
+                # Get chapters
+                chapters = scraper.get_chapters(details)
+                if not chapters:
+                    raise HTTPException(status_code=404, detail="No chapters found for this manga")
+                
+                # Get pages for first chapter
+                pages = scraper.get_pages(chapters[0])
+            
+            # Calculate execution time
+            execution_time_ms = int((time.time() - start_time) * 1000)
+            
+            # Return pages with metadata
+            return {
+                "source": source,
+                "manga_id": id,
+                "chapter_id": chapter_id or (chapters[0]["id"] if 'chapters' in locals() else ""),
+                "pages": pages,
+                "executionTimeMs": execution_time_ms
+            }
+            
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown source: {source}")
+            
+    except Exception as e:
+        # Log the error
+        print(f"Error getting pages: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting pages: {str(e)}")
+
