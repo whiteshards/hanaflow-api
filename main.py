@@ -105,6 +105,45 @@ async def search_manga(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error searching manga: {str(e)}")
 
+@app.get("/api/filters")
+async def get_filters(
+    source: str = Query(..., description="Source to get filters for (comick, nhentai)")
+):
+    """
+    Get available filters for a specific source
+    
+    - **source**: The source to get filters for (comick, nhentai)
+    """
+    start_time = time.time()
+    
+    # Validate source
+    if source not in scrapers:
+        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(scrapers.keys())}")
+    
+    try:
+        if source == "comick":
+            from manga_scrapers.comick import ComickFilters
+            filters = ComickFilters.get_filters()
+        elif source == "nhentai":
+            filters = nhentai_scraper.get_filters()
+        else:
+            raise HTTPException(status_code=400, detail=f"Filters not available for source: {source}")
+        
+        # Calculate execution time
+        execution_time_ms = int((time.time() - start_time) * 1000)
+        
+        # Prepare response
+        response = {
+            "source": source,
+            "filters": filters,
+            "executionTimeMs": execution_time_ms
+        }
+        
+        return response
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting filters: {str(e)}")
+
 @app.get("/api/manga/popular", response_model=MangaResponse)
 async def get_popular_manga(
     source: str = Query(..., description="Source to fetch from (comick, nhentai)"),
