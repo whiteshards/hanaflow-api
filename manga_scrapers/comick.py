@@ -397,19 +397,32 @@ class ComickScraper:
             if any(g in self.preferences["ignored_groups"] for g in chapter_groups):
                 continue
             
+            # Safely get chapter and volume numbers
+            chap_str = chapter.get("chap", "0")
+            vol_str = chapter.get("vol", "0")
+            
+            # Check if values are not None before using replace
+            chap_is_digit = False
+            if chap_str is not None:
+                chap_is_digit = chap_str.replace(".", "", 1).isdigit()
+            
+            vol_is_digit = False
+            if vol_str is not None:
+                vol_is_digit = vol_str.replace(".", "", 1).isdigit()
+            
             # Parse chapter data
             chapter_data = {
                 "id": chapter.get("hid", ""),
-                "url": f"{manga_url}/{chapter.get('hid')}-chapter-{chapter.get('chap', '')}-{chapter.get('lang', '')}",
+                "url": f"{manga_url}/{chapter.get('hid', '')}-chapter-{chap_str or ''}-{chapter.get('lang', '')}",
                 "name": self._beautify_chapter_name(
-                    chapter.get("vol", ""),
-                    chapter.get("chap", ""),
+                    vol_str or "",
+                    chap_str or "",
                     chapter.get("title", "")
                 ),
                 "uploaded": self._parse_date(chapter.get("created_at", "")),
                 "scanlator": ", ".join(chapter.get("group_name", [])) or "Unknown",
-                "chapter_number": float(chapter.get("chap", "0")) if chapter.get("chap", "").replace(".", "", 1).isdigit() else 0,
-                "volume": float(chapter.get("vol", "0")) if chapter.get("vol", "").replace(".", "", 1).isdigit() else None,
+                "chapter_number": float(chap_str) if chap_is_digit else 0,
+                "volume": float(vol_str) if vol_is_digit else None,
             }
             
             chapters.append(chapter_data)
