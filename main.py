@@ -242,7 +242,7 @@ if __name__ == "__main__":
 async def get_manga_pages(
     source: str = Query(..., description="Source to fetch from (comick, nhentai)"),
     id: str = Query(..., description="ID or chapter ID of the manga"),
-    chapter_id: Optional[str] = Query(None, description="Chapter ID for multi-chapter manga (optional)")
+    #chapter_id: Optional[str] = Query(None, description="Chapter ID for multi-chapter manga (optional)")
 ):
     """
     Get pages for a specific manga or chapter
@@ -252,7 +252,7 @@ async def get_manga_pages(
     - **chapter_id**: Optional chapter ID for multi-chapter manga
     """
     start_time = time.time()
-    
+    chapter_id=id
     try:
         if source == "nhentai":
             scraper = NHentaiScraper()
@@ -292,14 +292,15 @@ async def get_manga_pages(
             if chapter_id:
                 # Direct chapter request
                 chapter = {"id": chapter_id, "url": f"/comic/{id}/{chapter_id}-chapter-1-en"}
-                pages = scraper.get_pages(chapter)
+                pages = scraper.get_pages(chapter_id)
             else:
                 # Get manga details first
-                manga = {"id": id, "url": f"/comic/{id}#"}
-                details = scraper.get_manga_details(manga)
+                #manga = {"id": id, "url": f"/comic/{id}#"}
+                #details = scraper.get_manga_details(manga)
                 
                 # Get chapters
-                chapters = scraper.get_chapters(details)
+                #chapter = {"id": chapter_id, "url":}
+                chapters = scraper.get_chapters(chapter_id)
                 if not chapters:
                     raise HTTPException(status_code=404, detail="No chapters found for this manga")
                 

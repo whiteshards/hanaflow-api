@@ -455,9 +455,9 @@ class ComickScraper:
     
     def get_pages(self, chapter: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Get pages for a chapter."""
-        print(f"🔍 Getting pages for chapter: {chapter.get('name', chapter.get('url', 'Unknown'))}")
+        #print(f"🔍 Getting pages for chapter: {chapter.get('name', chapter.get('url', 'Unknown'))}")
         
-        if chapter.get('url'):
+        if type(chapter) == dict:
             chapter_hid = chapter["url"].split("/")[-1].split("-")[0]
         else:
             chapter_hid = chapter
