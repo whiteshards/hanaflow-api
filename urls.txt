@@ -1,6 +1,0 @@
-
-==== Hanime: 3 quality options ====
-720p: https://m3u8s.highwinds-cdn.com/api/v9/m3u8s/fbxrsqd9w05bp5gkk67dymy197Zvj15Ahnsk435fzx53gAg6fjf8A.m3u8
-480p: https://m3u8s.highwinds-cdn.com/api/v9/m3u8s/rzk2vngrs4r6kl492g4wk1fztqZbgk7407whmAnwmn3ltqh9wnr77.m3u8
-360p: https://m3u8s.highwinds-cdn.com/api/v9/m3u8s/l24fffj0nc4v1n8ndt1Atzqfz2Zzvgnj5swn16rhrxq124rcxcrw7.m3u8
-

@@ -1,2 +1,0 @@
-Payload: {'variables': {'_id': 'dqvMzB6h9MQA5XJEz'}, 'query': 'query ($_id: String!) { show(_id: $_id) { _id availableEpisodesDetail { sub dub } } }'}
-Respone Text:{"errors":[{"message":"Field \"availableEpisodesDetail\" must not have a selection since type \"Object\" has no subfields.","locations":[{"line":1,"column":71}],"extensions":{"code":"GRAPHQL_VALIDATION_FAILED"}}]}
