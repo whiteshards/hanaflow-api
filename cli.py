@@ -416,7 +416,7 @@ def main_menu():
                                 
                                 # Get manga details
                                 print(f"\nFetching details for {selected_manga.get('title', 'Unknown Title')}...")
-                                manga_details = comick_searcher.get_manga_details(selected_manga.get('slug', ''))
+                                manga_details = comick_searcher.get_manga_details(selected_manga)
                                 
                                 if manga_details:
                                     # Display manga details
