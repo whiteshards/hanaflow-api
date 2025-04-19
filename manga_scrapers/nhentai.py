@@ -469,7 +469,12 @@ class NHentaiScraper:
                 media_server = int(media_server_match.group(1))
             
             # Try to extract JSON data
-            script_data = soup.select_one("script:contains(JSON.parse)")
+            script_data = None
+            for script in soup.select("script"):
+                if script.string and "JSON.parse" in script.string:
+                    script_data = script
+                    break
+                    
             if script_data:
                 json_match = re.search(r'JSON\.parse\(\s*"(.*)"\s*\)', script_data.string)
                 if json_match:
@@ -477,36 +482,61 @@ class NHentaiScraper:
                     json_str = re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m.group(1), 16)), json_str)
                     json_str = json_str.replace('\\"', '"').replace('\\\\', '\\')
                     
-                    data = json.loads(json_str)
-                    media_id = data.get("media_id", "")
-                    
-                    # Extract image data
-                    images = data.get("images", {})
-                    pages = images.get("pages", [])
-                    
-                    for i, page in enumerate(pages):
-                        page_type = page.get("t", "j")
-                        extension = self.IMAGE_TYPES.get(page_type, "jpg")
-                        pages_data.append({
-                            "index": i,
-                            "url": f"https://i{media_server}.nhentai.net/galleries/{media_id}/{i + 1}.{extension}"
-                        })
+                    try:
+                        data = json.loads(json_str)
+                        media_id = data.get("media_id", "")
+                        
+                        # Extract image data
+                        images = data.get("images", {})
+                        pages = images.get("pages", [])
+                        
+                        for i, page in enumerate(pages):
+                            page_type = page.get("t", "j")
+                            extension = self.IMAGE_TYPES.get(page_type, "jpg")
+                            pages_data.append({
+                                "index": i,
+                                "url": f"https://i{media_server}.nhentai.net/galleries/{media_id}/{i + 1}.{extension}"
+                            })
+                    except json.JSONDecodeError:
+                        print(f"Error parsing JSON data: {json_str[:100]}...")
+                    except Exception as e:
+                        print(f"Error processing JSON data: {e}")
             
             # If we couldn't extract from JSON, try HTML
             if not pages_data:
-                # Get media ID from thumbnail or other sources
+                print("Falling back to HTML parsing for pages...")
+                # Try to get media ID from thumbnail
                 thumb_element = soup.select_one("#cover img")
                 if thumb_element:
                     thumb_url = thumb_element.get("data-src") or thumb_element.get("src") or ""
+                    print(f"Thumbnail URL: {thumb_url}")
                     media_id_match = re.search(r'/galleries/(\d+)/', thumb_url)
                     if media_id_match:
                         media_id = media_id_match.group(1)
+                        print(f"Found media ID: {media_id}")
+                
+                # Try to get media ID from other image elements if not found
+                if not media_id:
+                    thumb_elements = soup.select(".gallerythumb img")
+                    for element in thumb_elements:
+                        thumb_url = element.get("data-src") or element.get("src") or ""
+                        media_id_match = re.search(r'/galleries/(\d+)/', thumb_url)
+                        if media_id_match:
+                            media_id = media_id_match.group(1)
+                            print(f"Found media ID from thumbnails: {media_id}")
+                            break
                 
                 # Get page count from info
                 pages_element = soup.select_one("#info > div")
                 pages_text = pages_element.text if pages_element else ""
                 pages_match = re.search(r'(\d+) pages', pages_text)
                 page_count = int(pages_match.group(1)) if pages_match else 0
+                print(f"Detected page count: {page_count}")
+                
+                # Try to also find page count by counting thumbnails
+                if not page_count:
+                    page_count = len(soup.select(".gallerythumb"))
+                    print(f"Counted thumbnails: {page_count}")
                 
                 if media_id and page_count:
                     # We don't know file extensions, so default to jpg
@@ -515,6 +545,19 @@ class NHentaiScraper:
                             "index": i,
                             "url": f"https://i{media_server}.nhentai.net/galleries/{media_id}/{i + 1}.jpg"
                         })
+                        
+                # If still no pages, try alternative methods
+                if not pages_data:
+                    print("Trying alternative page extraction...")
+                    # Look for direct image URLs in the page
+                    img_elements = soup.select("#image-container img")
+                    for i, img in enumerate(img_elements):
+                        img_url = img.get("src") or img.get("data-src") or ""
+                        if img_url:
+                            pages_data.append({
+                                "index": i,
+                                "url": img_url
+                            })
             
             # Write URLs to file for convenience
             with open('urls.txt', 'a', encoding='utf-8') as f:
@@ -526,6 +569,8 @@ class NHentaiScraper:
             
         except Exception as e:
             print(f"❌ Error getting pages: {e}")
+            import traceback
+            traceback.print_exc()
             return []
     
     def get_filters(self) -> Dict[str, Any]:
