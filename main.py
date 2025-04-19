@@ -193,7 +193,7 @@ async def get_latest_manga(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching latest manga: {str(e)}")
 
-@app.get("/details")
+@app.get("/api/manga/details")
 async def get_details(
     source: str,
     id: str
