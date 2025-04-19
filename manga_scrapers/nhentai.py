@@ -205,15 +205,47 @@ class NHentaiScraper:
         """Get popular manga list."""
         print(f"🔍 Getting popular doujinshi (page {page})...")
         
-        filters = {"sort": "popular"}
-        return self.search_manga("", page, filters)
+        try:
+            # Use direct popular path instead of search path
+            url = f"{self.BASE_URL}/popular"
+            if page > 1:
+                url += f"?page={page}"
+                
+            response = self.session.get(
+                url,
+                headers=self.headers,
+                timeout=30
+            )
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.text, "html.parser")
+            return self._parse_search_results(soup)
+        except Exception as e:
+            print(f"❌ Error getting popular manga: {e}")
+            return []
     
     def get_latest_manga(self, page: int = 1) -> List[Dict[str, Any]]:
         """Get latest manga list."""
         print(f"🔍 Getting latest doujinshi (page {page})...")
         
-        # For latest, we don't need a sort parameter as date is default
-        return self.search_manga("", page)
+        try:
+            # For latest, we use the main page as it shows latest by default
+            url = self.BASE_URL
+            if page > 1:
+                url += f"?page={page}"
+                
+            response = self.session.get(
+                url,
+                headers=self.headers,
+                timeout=30
+            )
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.text, "html.parser")
+            return self._parse_search_results(soup)
+        except Exception as e:
+            print(f"❌ Error getting latest manga: {e}")
+            return []
     
     def get_manga_details(self, manga: Dict[str, Any]) -> Dict[str, Any]:
         """Get detailed information about a manga."""
