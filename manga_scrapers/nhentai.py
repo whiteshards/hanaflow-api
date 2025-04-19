@@ -260,52 +260,13 @@ class NHentaiScraper:
             
         print(f"🔍 Getting doujin details for ID: {manga_id}")
         
-        # Add retry logic with exponential backoff
-        max_retries = 3
-        retry_count = 0
-        retry_delay = 2  # Start with 2 seconds delay
-        
-        while retry_count < max_retries:
-            try:
-                print(f"Attempt {retry_count + 1}/{max_retries} for manga ID: {manga_id}")
-                response = self.session.get(
-                    f"{self.BASE_URL}/g/{manga_id}/",
-                    headers=self.headers,
-                    timeout=30
-                )
-                print(f"Status code: {response.status_code}")
-                
-                # Break out of loop if successful
-                response.raise_for_status()
-                break
-            except requests.HTTPError as http_err:
-                print(f"HTTP error occurred: {http_err} (Status: {getattr(http_err.response, 'status_code', 'Unknown')})")
-                if getattr(http_err.response, 'status_code', 0) == 404:
-                    print("Resource not found (404) - page may not exist or require authentication")
-                    # Don't retry on 404 errors
-                    break
-                retry_count += 1
-                if retry_count < max_retries:
-                    print(f"Retrying in {retry_delay} seconds...")
-                    time.sleep(retry_delay)
-                    retry_delay *= 2  # Exponential backoff
-            except Exception as e:
-                print(f"Error occurred: {e}")
-                retry_count += 1
-                if retry_count < max_retries:
-                    print(f"Retrying in {retry_delay} seconds...")
-                    time.sleep(retry_delay)
-                    retry_delay *= 2  # Exponential backoff
-        
-        if retry_count == max_retries:
-            print(f"Failed to get manga details after {max_retries} attempts")
-            return {
-                "id": manga_id,
-                "url": f"/g/{manga_id}/",
-                "title": f"Gallery #{manga_id} (Access Error)",
-                "description": "Unable to access this content. The page may be unavailable or IP restricted.",
-                "source": "nhentai"
-            }
+        try:
+            response = self.session.get(
+                f"{self.BASE_URL}/g/{manga_id}/",
+                headers=self.headers,
+                timeout=30
+            )
+            response.raise_for_status()
             
             soup = BeautifulSoup(response.text, "html.parser")
             
@@ -663,48 +624,6 @@ class NHentaiScraper:
             
         except Exception as e:
             print(f"❌ Error getting pages: {e}")
-            print(f"Request URL attempted: {self.BASE_URL}/g/{manga_id}/")
-            
-            # Attempt direct API fetch as fallback
-            try:
-                print("🔄 Attempting API fallback method...")
-                api_url = f"{self.API_URL}/gallery/{manga_id}"
-                api_response = self.session.get(
-                    api_url,
-                    headers=self.headers,
-                    timeout=30
-                )
-                
-                # Print status code for debugging
-                print(f"API Status code: {api_response.status_code}")
-                
-                if api_response.status_code == 200:
-                    api_data = api_response.json()
-                    media_id = api_data.get("media_id", "")
-                    images = api_data.get("images", {})
-                    pages = images.get("pages", [])
-                    
-                    pages_data = []
-                    for i, page in enumerate(pages):
-                        page_type = page.get("t", "j")
-                        extension = self.IMAGE_TYPES.get(page_type, "jpg")
-                        pages_data.append({
-                            "index": i,
-                            "url": f"https://i.nhentai.net/galleries/{media_id}/{i + 1}.{extension}"
-                        })
-                    
-                    # Write URLs to file for convenience
-                    with open('urls.txt', 'a', encoding='utf-8') as f:
-                        f.write(f"\n==== NHentai (API fallback): {manga_id} ====\n")
-                        for i, page in enumerate(pages_data, 1):
-                            f.write(f"Page {i}: {page.get('url', 'No URL')}\n")
-                    
-                    return pages_data
-                else:
-                    print(f"API fallback failed with status code: {api_response.status_code}")
-            except Exception as fallback_error:
-                print(f"API fallback also failed: {fallback_error}")
-            
             import traceback
             traceback.print_exc()
             return []
