@@ -4,9 +4,11 @@ import re
 import time
 import urllib.parse
 import requests
+import cloudscraper
 from typing import List, Dict, Any, Optional, Set
 from datetime import datetime
 import math
+import random
 
 class ComickScraper:
     # Constants
@@ -20,12 +22,25 @@ class ComickScraper:
     
     def __init__(self, session: Optional[requests.Session] = None, lang: str = "en"):
         """Initialize ComickScraper with optional session and language preference."""
-        self.session = session or requests.Session()
+        self.session = session or cloudscraper.create_scraper(
+            browser={
+                'browser': 'chrome',
+                'platform': 'windows',
+                'mobile': False
+            }
+        )
         self.lang = lang
         self.comick_lang = lang
         self.headers = {
             "Referer": f"{self.BASE_URL}/",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Origin": self.BASE_URL,
+            "Connection": "keep-alive",
+            "sec-ch-ua": '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"'
         }
         
         # Preferences (default values)
@@ -437,8 +452,8 @@ class ComickScraper:
         
         return pages
     
-    def _make_request(self, url: str, params: Optional[Dict[str, Any]] = None, method: str = "GET") -> Any:
-        """Make a request to the API."""
+    def _make_request(self, url: str, params: Optional[Dict[str, Any]] = None, method: str = "GET", retries: int = 3) -> Any:
+        """Make a request to the API with retry logic."""
         try:
             # Prepare params for GET request
             if method == "GET" and params:
@@ -458,31 +473,40 @@ class ComickScraper:
                 url = urllib.parse.urlunparse(url_parts)
                 params = None
             
-            response = self.session.request(
-                method,
-                url,
-                params=params,
-                headers=self.headers,
-                timeout=30
-            )
-            response.raise_for_status()
+            # Try the request with retries
+            last_error = None
+            for attempt in range(retries):
+                try:
+                    response = self.session.request(
+                        method,
+                        url,
+                        params=params,
+                        headers=self.headers,
+                        timeout=30
+                    )
+                    response.raise_for_status()
+                    
+                    # Parse JSON response
+                    data = response.json()
+                    
+                    # Check for API error
+                    if isinstance(data, dict) and "statusCode" in data and "message" in data:
+                        print(f"❌ API error: {data['statusCode']} - {data['message']}")
+                        return None
+                    
+                    return data
+                    
+                except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
+                    last_error = e
+                    wait_time = 2 ** attempt  # Exponential backoff
+                    print(f"⚠️ Request attempt {attempt+1}/{retries} failed: {e}")
+                    print(f"Waiting {wait_time} seconds before retry...")
+                    time.sleep(wait_time)
             
-            # Parse JSON response
-            data = response.json()
-            
-            # Check for API error
-            if isinstance(data, dict) and "statusCode" in data and "message" in data:
-                print(f"❌ API error: {data['statusCode']} - {data['message']}")
-                return None
-            
-            return data
-            
-        except requests.exceptions.RequestException as e:
-            print(f"❌ Request error: {e}")
+            # If we get here, all retries failed
+            print(f"❌ All {retries} request attempts failed. Last error: {last_error}")
             return None
-        except json.JSONDecodeError:
-            print("❌ Failed to parse JSON response")
-            return None
+            
         except Exception as e:
             print(f"❌ Unexpected error: {e}")
             return None
