@@ -52,7 +52,7 @@ class NHentaiScraper:
     
     def search_manga(self, query: str, page: int = 1, filters: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """Search for manga with filters."""
-        print(f"🔍 Searching for doujin: '{query}' (page {page})...")
+        print(f"🔍 Searching for doujin: '{query}'...")
         
         filters = filters or {}
         
@@ -71,7 +71,7 @@ class NHentaiScraper:
         base_search_url = f"{self.BASE_URL}/search"
         url_params = {
             "q": self._build_search_query(query, filters),
-            "page": page
+            "page": 1  # Start with page 1
         }
         
         # Add sort parameter if present
@@ -82,18 +82,42 @@ class NHentaiScraper:
         if filters.get("favorites_only", False):
             base_search_url = f"{self.BASE_URL}/favorites"
         
-        # Make the request
+        # Make the request and fetch all pages
         try:
-            response = self.session.get(
-                base_search_url, 
-                params=url_params, 
-                headers=self.headers,
-                timeout=30
-            )
-            response.raise_for_status()
+            all_results = []
+            current_page = 1
+            has_next_page = True
             
-            soup = BeautifulSoup(response.text, "html.parser")
-            return self._parse_search_results(soup)
+            while has_next_page:
+                url_params["page"] = current_page
+                response = self.session.get(
+                    base_search_url, 
+                    params=url_params, 
+                    headers=self.headers,
+                    timeout=30
+                )
+                response.raise_for_status()
+                
+                soup = BeautifulSoup(response.text, "html.parser")
+                page_results = self._parse_search_results(soup)
+                
+                if page_results:
+                    all_results.extend(page_results)
+                    
+                    # Check if there's a next page
+                    next_page = soup.select_one("#content > section.pagination > a.next")
+                    if next_page:
+                        current_page += 1
+                    else:
+                        has_next_page = False
+                else:
+                    has_next_page = False
+                
+                # Safety check to prevent too many requests
+                if current_page > 5:  # Limit to 5 pages to prevent overloading
+                    break
+            
+            return all_results
             
         except Exception as e:
             print(f"❌ Error searching nhentai: {e}")

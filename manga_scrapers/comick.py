@@ -80,7 +80,7 @@ class ComickScraper:
     
     def search_manga(self, query: str, page: int = 1, filters: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """Search for manga with filters."""
-        print(f"🔍 Searching for manga: '{query}' (page {page})...")
+        print(f"🔍 Searching for manga: '{query}'...")
         
         filters = filters or {}
         
@@ -90,17 +90,12 @@ class ComickScraper:
             manga_details = self.get_manga_details({"url": f"/comic/{slug_or_hid}#"})
             return [manga_details] if manga_details else []
         
-        # Text search (no pagination in API)
-        if query and page > 1 and self.search_results:
-            # Return from cached results for pagination
-            return self._paginate_search_results(page)
-        
         if query:
             # Text search
             url = f"{self.API_URL}/v1.0/search"
             params = {
                 "q": query.strip(),
-                "limit": 300,
+                "limit": 300,  # Use a higher limit for better results
                 "page": 1,
                 "tachiyomi": "true"
             }
@@ -109,14 +104,24 @@ class ComickScraper:
             if not response:
                 return []
             
-            self.search_results = response
-            return self._paginate_search_results(page)
+            # Transform the results
+            manga_list = []
+            for item in response:
+                manga = {
+                    "id": item.get("hid", ""),
+                    "title": item.get("title", "Unknown"),
+                    "url": f"/comic/{item.get('hid')}#", 
+                    "thumbnail_url": self._parse_cover(item.get("cover_url"), item.get("md_covers", []))
+                }
+                manga_list.append(manga)
+            
+            return manga_list
         
-        # Filter search with pagination
+        # Filter search
         url = f"{self.API_URL}/v1.0/search"
         params = {
-            "limit": self.PAGE_SIZE,
-            "page": page,
+            "limit": 300,  # Use a higher limit
+            "page": 1,
             "tachiyomi": "true"
         }
         
@@ -130,22 +135,38 @@ class ComickScraper:
                 if tag.strip():
                     params.setdefault("excluded-tags", []).append(self._format_tag(tag.strip()))
         
-        response = self._make_request(url, params=params)
-        if not response:
-            return []
+        all_results = []
+        current_page = 1
+        has_next_page = True
         
-        # Transform the results
-        manga_list = []
-        for item in response:
-            manga = {
-                "id": item.get("hid", ""),
-                "title": item.get("title", "Unknown"),
-                "url": f"/comic/{item.get('hid')}#", 
-                "thumbnail_url": self._parse_cover(item.get("cover_url"), item.get("md_covers", []))
-            }
-            manga_list.append(manga)
+        # Fetch multiple pages if needed for filter search
+        while has_next_page and current_page <= 5:  # Limit to 5 pages
+            params["page"] = current_page
+            response = self._make_request(url, params=params)
+            
+            if not response or len(response) == 0:
+                has_next_page = False
+                break
+                
+            # Transform the results
+            for item in response:
+                manga = {
+                    "id": item.get("hid", ""),
+                    "title": item.get("title", "Unknown"),
+                    "url": f"/comic/{item.get('hid')}#", 
+                    "thumbnail_url": self._parse_cover(item.get("cover_url"), item.get("md_covers", [])),
+                    "description": item.get("desc", ""),
+                    "status": self._parse_status(item.get("status"), item.get("translation_completed"))
+                }
+                all_results.append(manga)
+            
+            # Check if we should continue to next page
+            if len(response) < params["limit"]:
+                has_next_page = False
+            else:
+                current_page += 1
         
-        return manga_list
+        return all_results
     
     def _paginate_search_results(self, page: int) -> List[Dict[str, Any]]:
         """Paginate search results."""
