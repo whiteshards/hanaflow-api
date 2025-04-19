@@ -14,3 +14,8 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python cli.py"
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+exposeLocalhost = true
