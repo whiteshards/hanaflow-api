@@ -79,9 +79,21 @@ async def search_manga(
         # Search manga
         results = scraper.search_manga(q)
 
-        # Add source to each result
+        # Add source and full URLs to each result
         for result in results:
             result["source"] = source
+
+            # Add full URL paths for manga
+            if "url" in result and not result["url"].startswith("http"):
+                if source == "nhentai":
+                    result["full_url"] = f"https://nhentai.net{result['url']}"
+                elif source == "comick":
+                    result["full_url"] = f"https://comick.io{result['url'].rstrip('#')}"
+
+            # Add full URL for thumbnails if they're relative
+            if "thumbnail_url" in result and result["thumbnail_url"] and not result["thumbnail_url"].startswith("http"):
+                if source == "nhentai":
+                    result["thumbnail_url"] = f"https://nhentai.net{result['thumbnail_url']}"
 
         # Paginate results
         paginated_results = paginate_results(results, page, limit)
@@ -124,9 +136,21 @@ async def get_popular_manga(
         # Get popular manga
         results = scraper.get_popular_manga()
 
-        # Add source to each result
+        # Add source and full URLs to each result
         for result in results:
             result["source"] = source
+
+            # Add full URL paths for manga
+            if "url" in result and not result["url"].startswith("http"):
+                if source == "nhentai":
+                    result["full_url"] = f"https://nhentai.net{result['url']}"
+                elif source == "comick":
+                    result["full_url"] = f"https://comick.io{result['url'].rstrip('#')}"
+
+            # Add full URL for thumbnails if they're relative
+            if "thumbnail_url" in result and result["thumbnail_url"] and not result["thumbnail_url"].startswith("http"):
+                if source == "nhentai":
+                    result["thumbnail_url"] = f"https://nhentai.net{result['thumbnail_url']}"
 
         # Paginate results
         paginated_results = paginate_results(results, page, limit)
@@ -168,9 +192,21 @@ async def get_latest_manga(
         # Get latest manga
         results = scraper.get_latest_manga()
 
-        # Add source to each result
+        # Add source and full URLs to each result
         for result in results:
             result["source"] = source
+
+            # Add full URL paths for manga
+            if "url" in result and not result["url"].startswith("http"):
+                if source == "nhentai":
+                    result["full_url"] = f"https://nhentai.net{result['url']}"
+                elif source == "comick":
+                    result["full_url"] = f"https://comick.io{result['url'].rstrip('#')}"
+
+            # Add full URL for thumbnails if they're relative
+            if "thumbnail_url" in result and result["thumbnail_url"] and not result["thumbnail_url"].startswith("http"):
+                if source == "nhentai":
+                    result["thumbnail_url"] = f"https://nhentai.net{result['thumbnail_url']}"
 
         # Paginate results
         paginated_results = paginate_results(results, page, limit)
