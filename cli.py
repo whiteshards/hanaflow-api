@@ -490,8 +490,8 @@ def main_menu():
                                                 selected_chapter = chapters[ch_idx]
                                                 
                                                 # Get chapter pages
-                                                print(f"\nFetching pages for {selected_chapter.get('title', f'Chapter {selected_chapter.get('chapter_number', ch_idx+1)}')}...")
-                                                pages = comick_searcher.get_pages(selected_chapter.get('id', ''))
+                                                print(f"\nFetching pages for {selected_chapter.get('name', f'Chapter {selected_chapter.get('chapter_number', ch_idx+1)}')}...")
+                                                pages = comick_searcher.get_pages(selected_chapter)
                                                 
                                                 if not pages:
                                                     print("No pages found for this chapter.")
