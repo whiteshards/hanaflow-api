@@ -9,10 +9,10 @@ import re
 import json
 
 # Importing our scrapers
-from scrapers.hahomoe_scraper import HahoMoeSearcher
-from scrapers.anizone_scraper import AniZoneSearcher
-from scrapers.allanime_scraper import AllAnimeScraper
-from scrapers.hanime_scraper import HanimeScraper # Added Hanime scraper import
+from anime_scrapers.hahomoe_scraper import HahoMoeSearcher
+from anime_scrapers.anizone_scraper import AniZoneSearcher
+from anime_scrapers.allanime_scraper import AllAnimeScraper
+from anime_scrapers.hanime_scraper import HanimeScraper # Added Hanime scraper import
 from manga_scrapers.comick import ComickScraper # Added ComickScraper import
 from manga_scrapers.nhentai import NHentaiScraper # Added NHentaiScraper import
 
@@ -42,14 +42,14 @@ def main_menu():
         print("5. Search on Hanime only") # Added Hanime search option
         print("6. Search manga on Comick") # Added Comick manga search option
         print("7. Search manga on NHentai") # Added NHentai search option
-        print("8. Set Hanime Quality Preference") # Added Hanime quality setting option
-        print("9. Exit") # Updated exit option number
+        #print("8. Set Hanime Quality Preference") # Added Hanime quality setting option
+        print("8. Exit") # Updated exit option number
 
         try:
-            choice = input("\nEnter your choice (1-9): ") # Updated choice range
+            choice = input("\nEnter your choice (1-8): ") # Updated choice range
 
-            if choice in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                if choice == '9':
+            if choice in ['1', '2', '3', '4', '5', '6', '7', '8']:
+                if choice == '8':
                     print("Exiting...")
                     break
 
@@ -737,7 +737,7 @@ def main_menu():
                             print(f"An error occurred while selecting manga: {e}")
                             continue
                 
-                elif choice == '8':
+                elif choice == '89':
                     try:
                         quality = input("Enter desired Hanime quality (e.g., 720p, 1080p): ")
                         hanime_searcher.set_quality(quality)
