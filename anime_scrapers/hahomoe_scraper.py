@@ -35,7 +35,7 @@ class HahoMoeSearcher:
         # Quality options
         self.quality_list = ["1080p", "720p", "480p", "360p"]
 
-    def search_anime(self, query):
+    def search_anime(self, query, max_pages=5):
         """Search for anime on HahoMoe by title"""
         try:
             print(f"🔍 Searching for '{query}' on HahoMoe...")
@@ -48,10 +48,7 @@ class HahoMoeSearcher:
             # Encode the query for the URL
             encoded_query = urllib.parse.quote(query)
             
-            # Create the search URL with params
-            url = f"{self.search_url}?page=1&s={sort_param}&q={encoded_query}"
-            
-            # Add tag filters if present
+            # Prepare tag filters
             http_query = ""
             if self.active_filters["included_tags"]:
                 included_tags = " ".join([f'genre:{tag}' for tag in self.active_filters["included_tags"]])
@@ -61,62 +58,84 @@ class HahoMoeSearcher:
                 excluded_tags = " ".join([f'-genre:{tag}' for tag in self.active_filters["excluded_tags"]])
                 http_query += f" {excluded_tags}"
             
-            if http_query:
-                url += f"&q={urllib.parse.quote(http_query.strip())}"
-            
-            response = self.session.get(url, headers=self.headers)
-            
-            if response.status_code != 200:
-                print(f"❌ Search failed with status code: {response.status_code}")
-                return []
-            
-            soup = BeautifulSoup(response.text, 'html.parser')
-            search_results = soup.select('ul.anime-loop.loop > li > a')
-            
-            if not search_results:
-                print("No results found on HahoMoe. Try a different search term.")
-                return []
-            
             results = []
-            for result in search_results:
-                try:
-                    title_elem = result.select_one('div.label > span, div span.thumb-title')
-                    title = title_elem.text.strip() if title_elem else "Unknown Title"
-                    url = result.get('href')
-                    full_url = self.base_url + url if not url.startswith('http') else url
-                    
-                    # Get the poster image
-                    poster_elem = result.select_one('img')
-                    poster = poster_elem.get('src') if poster_elem else "No poster available"
-                    
-                    # Try to get type and year if available
-                    additional_info = result.select_one('div.fd-infor')
-                    anime_type = "Unknown"
-                    year = "Unknown"
-                    
-                    if additional_info:
-                        type_elem = additional_info.select_one('.fdi-item:nth-child(1)')
-                        year_elem = additional_info.select_one('.fdi-item:nth-child(2)')
-                        
-                        if type_elem:
-                            anime_type = type_elem.text.strip()
-                        if year_elem:
-                            year = year_elem.text.strip()
-                    
-                    # Add source identifier to differentiate from other results
-                    results.append({
-                        'id': url.split('/')[-1],
-                        'title': f"{title} [HahoMoe]",
-                        'url': full_url + "?s=srt-d",  # Add sort parameter
-                        'poster': poster,
-                        'type': anime_type,
-                        'year': year,
-                        'source': 'hahomoe'
-                    })
-                except Exception as e:
-                    print(f"Error processing a HahoMoe result: {e}")
-                    continue
+            current_page = 1
+            has_next_page = True
             
+            while has_next_page and current_page <= max_pages:
+                # Create the search URL with params for current page
+                url = f"{self.search_url}?page={current_page}&s={sort_param}&q={encoded_query}"
+                
+                # Add tag filters if present
+                if http_query:
+                    url += f"&q={urllib.parse.quote(http_query.strip())}"
+                
+                print(f"Fetching HahoMoe search results page {current_page}...")
+                response = self.session.get(url, headers=self.headers)
+                
+                if response.status_code != 200:
+                    print(f"❌ Search failed with status code: {response.status_code}")
+                    break
+                
+                soup = BeautifulSoup(response.text, 'html.parser')
+                search_results = soup.select('ul.anime-loop.loop > li > a')
+                
+                if not search_results:
+                    print(f"No results found on page {current_page}.")
+                    break
+                
+                # Process results on this page
+                page_results_count = 0
+                for result in search_results:
+                    try:
+                        title_elem = result.select_one('div.label > span, div span.thumb-title')
+                        title = title_elem.text.strip() if title_elem else "Unknown Title"
+                        url = result.get('href')
+                        full_url = self.base_url + url if not url.startswith('http') else url
+                        
+                        # Get the poster image
+                        poster_elem = result.select_one('img')
+                        poster = poster_elem.get('src') if poster_elem else "No poster available"
+                        
+                        # Try to get type and year if available
+                        additional_info = result.select_one('div.fd-infor')
+                        anime_type = "Unknown"
+                        year = "Unknown"
+                        
+                        if additional_info:
+                            type_elem = additional_info.select_one('.fdi-item:nth-child(1)')
+                            year_elem = additional_info.select_one('.fdi-item:nth-child(2)')
+                            
+                            if type_elem:
+                                anime_type = type_elem.text.strip()
+                            if year_elem:
+                                year = year_elem.text.strip()
+                        
+                        # Add source identifier to differentiate from other results
+                        results.append({
+                            'id': url.split('/')[-1],
+                            'title': f"{title} [HahoMoe]",
+                            'url': full_url + "?s=srt-d",  # Add sort parameter
+                            'poster': poster,
+                            'type': anime_type,
+                            'year': year,
+                            'source': 'hahomoe'
+                        })
+                        page_results_count += 1
+                    except Exception as e:
+                        print(f"Error processing a HahoMoe result: {e}")
+                        continue
+                
+                print(f"Found {page_results_count} results on page {current_page}")
+                
+                # Check if there's a next page
+                next_page_link = soup.select_one('ul.pagination li.page-item a[rel=next]')
+                if next_page_link:
+                    current_page += 1
+                else:
+                    has_next_page = False
+            
+            print(f"Total results found: {len(results)}")
             return results
             
         except Exception as e:
@@ -471,9 +490,9 @@ class HahoMoeSearcher:
             print(f"Invalid quality. Available options: {', '.join(self.quality_list)}")
             return False
     
-    def get_popular_anime(self, page=1):
+    def get_popular_anime(self, page=1, max_pages=5):
         """Get popular anime (sorted by views)"""
-        print(f"💫 Getting popular anime from HahoMoe (page {page})...")
+        print(f"💫 Getting popular anime from HahoMoe starting from page {page}...")
         
         all_results = []
         
@@ -482,121 +501,161 @@ class HahoMoeSearcher:
             self.active_filters["order_by"] = "vdy"
             self.active_filters["ordering"] = "-d"
             
-            # Popular anime URL
-            url = f"{self.base_url}/anime?s=vdy-d&page={page}"
+            current_page = page
+            has_next_page = True
             
-            response = self.session.get(url, headers=self.headers)
-            
-            if response.status_code != 200:
-                print(f"❌ Failed to get popular anime: Status code {response.status_code}")
-                return []
-            
-            soup = BeautifulSoup(response.text, 'html.parser')
-            anime_elements = soup.select('ul.anime-loop.loop > li > a')
-            
-            for anime in anime_elements:
-                try:
-                    title_elem = anime.select_one('div.label > span, div span.thumb-title')
-                    title = title_elem.text.strip() if title_elem else "Unknown Title"
-                    url = anime.get('href')
-                    full_url = self.base_url + url if not url.startswith('http') else url
-                    
-                    # Get the poster image
-                    poster_elem = anime.select_one('img')
-                    poster = poster_elem.get('src') if poster_elem else "No poster available"
-                    
-                    # Try to get type and year if available
-                    additional_info = anime.select_one('div.fd-infor')
-                    anime_type = "Unknown"
-                    year = "Unknown"
-                    
-                    if additional_info:
-                        type_elem = additional_info.select_one('.fdi-item:nth-child(1)')
-                        year_elem = additional_info.select_one('.fdi-item:nth-child(2)')
+            while has_next_page and current_page < page + max_pages:
+                # Popular anime URL
+                url = f"{self.base_url}/anime?s=vdy-d&page={current_page}"
+                
+                print(f"Fetching popular anime page {current_page}...")
+                response = self.session.get(url, headers=self.headers)
+                
+                if response.status_code != 200:
+                    print(f"❌ Failed to get popular anime: Status code {response.status_code}")
+                    break
+                
+                soup = BeautifulSoup(response.text, 'html.parser')
+                anime_elements = soup.select('ul.anime-loop.loop > li > a')
+                
+                if not anime_elements:
+                    print(f"No anime found on page {current_page}")
+                    break
+                
+                page_results_count = 0
+                for anime in anime_elements:
+                    try:
+                        title_elem = anime.select_one('div.label > span, div span.thumb-title')
+                        title = title_elem.text.strip() if title_elem else "Unknown Title"
+                        url = anime.get('href')
+                        full_url = self.base_url + url if not url.startswith('http') else url
                         
-                        if type_elem:
-                            anime_type = type_elem.text.strip()
-                        if year_elem:
-                            year = year_elem.text.strip()
-                    
-                    all_results.append({
-                        'id': url.split('/')[-1],
-                        'title': f"{title} [HahoMoe]",
-                        'url': full_url + "?s=srt-d",
-                        'poster': poster,
-                        'type': anime_type,
-                        'year': year,
-                        'source': 'hahomoe'
-                    })
-                except Exception as e:
-                    print(f"Error processing popular anime result: {e}")
-                    continue
+                        # Get the poster image
+                        poster_elem = anime.select_one('img')
+                        poster = poster_elem.get('src') if poster_elem else "No poster available"
+                        
+                        # Try to get type and year if available
+                        additional_info = anime.select_one('div.fd-infor')
+                        anime_type = "Unknown"
+                        year = "Unknown"
+                        
+                        if additional_info:
+                            type_elem = additional_info.select_one('.fdi-item:nth-child(1)')
+                            year_elem = additional_info.select_one('.fdi-item:nth-child(2)')
+                            
+                            if type_elem:
+                                anime_type = type_elem.text.strip()
+                            if year_elem:
+                                year = year_elem.text.strip()
+                        
+                        all_results.append({
+                            'id': url.split('/')[-1],
+                            'title': f"{title} [HahoMoe]",
+                            'url': full_url + "?s=srt-d",
+                            'poster': poster,
+                            'type': anime_type,
+                            'year': year,
+                            'source': 'hahomoe'
+                        })
+                        page_results_count += 1
+                    except Exception as e:
+                        print(f"Error processing popular anime result: {e}")
+                        continue
+                
+                print(f"Found {page_results_count} popular anime on page {current_page}")
+                
+                # Check if there's a next page
+                next_page_link = soup.select_one('ul.pagination li.page-item a[rel=next]')
+                if next_page_link:
+                    current_page += 1
+                else:
+                    has_next_page = False
             
-            print(f"Found {len(all_results)} popular anime from HahoMoe")
+            print(f"Total popular anime found: {len(all_results)}")
             return all_results
             
         except Exception as e:
             print(f"❌ Error getting popular anime from HahoMoe: {e}")
             return []
     
-    def get_latest_anime(self, page=1):
+    def get_latest_anime(self, page=1, max_pages=5):
         """Get latest anime (sorted by release date)"""
-        print(f"🆕 Getting latest anime from HahoMoe (page {page})...")
+        print(f"🆕 Getting latest anime from HahoMoe starting from page {page}...")
         
         all_results = []
         
         try:
-            # Latest anime URL (sorted by release date)
-            url = f"{self.base_url}/anime?s=rel-d&page={page}"
+            current_page = page
+            has_next_page = True
             
-            response = self.session.get(url, headers=self.headers)
-            
-            if response.status_code != 200:
-                print(f"❌ Failed to get latest anime: Status code {response.status_code}")
-                return []
-            
-            soup = BeautifulSoup(response.text, 'html.parser')
-            anime_elements = soup.select('ul.anime-loop.loop > li > a')
-            
-            for anime in anime_elements:
-                try:
-                    title_elem = anime.select_one('div.label > span, div span.thumb-title')
-                    title = title_elem.text.strip() if title_elem else "Unknown Title"
-                    url = anime.get('href')
-                    full_url = self.base_url + url if not url.startswith('http') else url
-                    
-                    # Get the poster image
-                    poster_elem = anime.select_one('img')
-                    poster = poster_elem.get('src') if poster_elem else "No poster available"
-                    
-                    # Try to get type and year if available
-                    additional_info = anime.select_one('div.fd-infor')
-                    anime_type = "Unknown"
-                    year = "Unknown"
-                    
-                    if additional_info:
-                        type_elem = additional_info.select_one('.fdi-item:nth-child(1)')
-                        year_elem = additional_info.select_one('.fdi-item:nth-child(2)')
+            while has_next_page and current_page < page + max_pages:
+                # Latest anime URL (sorted by release date)
+                url = f"{self.base_url}/anime?s=rel-d&page={current_page}"
+                
+                print(f"Fetching latest anime page {current_page}...")
+                response = self.session.get(url, headers=self.headers)
+                
+                if response.status_code != 200:
+                    print(f"❌ Failed to get latest anime: Status code {response.status_code}")
+                    break
+                
+                soup = BeautifulSoup(response.text, 'html.parser')
+                anime_elements = soup.select('ul.anime-loop.loop > li > a')
+                
+                if not anime_elements:
+                    print(f"No anime found on page {current_page}")
+                    break
+                
+                page_results_count = 0
+                for anime in anime_elements:
+                    try:
+                        title_elem = anime.select_one('div.label > span, div span.thumb-title')
+                        title = title_elem.text.strip() if title_elem else "Unknown Title"
+                        url = anime.get('href')
+                        full_url = self.base_url + url if not url.startswith('http') else url
                         
-                        if type_elem:
-                            anime_type = type_elem.text.strip()
-                        if year_elem:
-                            year = year_elem.text.strip()
-                    
-                    all_results.append({
-                        'id': url.split('/')[-1],
-                        'title': f"{title} [HahoMoe]",
-                        'url': full_url + "?s=srt-d",
-                        'poster': poster,
-                        'type': anime_type,
-                        'year': year,
-                        'source': 'hahomoe'
-                    })
-                except Exception as e:
-                    print(f"Error processing latest anime result: {e}")
-                    continue
+                        # Get the poster image
+                        poster_elem = anime.select_one('img')
+                        poster = poster_elem.get('src') if poster_elem else "No poster available"
+                        
+                        # Try to get type and year if available
+                        additional_info = anime.select_one('div.fd-infor')
+                        anime_type = "Unknown"
+                        year = "Unknown"
+                        
+                        if additional_info:
+                            type_elem = additional_info.select_one('.fdi-item:nth-child(1)')
+                            year_elem = additional_info.select_one('.fdi-item:nth-child(2)')
+                            
+                            if type_elem:
+                                anime_type = type_elem.text.strip()
+                            if year_elem:
+                                year = year_elem.text.strip()
+                        
+                        all_results.append({
+                            'id': url.split('/')[-1],
+                            'title': f"{title} [HahoMoe]",
+                            'url': full_url + "?s=srt-d",
+                            'poster': poster,
+                            'type': anime_type,
+                            'year': year,
+                            'source': 'hahomoe'
+                        })
+                        page_results_count += 1
+                    except Exception as e:
+                        print(f"Error processing latest anime result: {e}")
+                        continue
+                
+                print(f"Found {page_results_count} latest anime on page {current_page}")
+                
+                # Check if there's a next page
+                next_page_link = soup.select_one('ul.pagination li.page-item a[rel=next]')
+                if next_page_link:
+                    current_page += 1
+                else:
+                    has_next_page = False
             
-            print(f"Found {len(all_results)} latest anime from HahoMoe")
+            print(f"Total latest anime found: {len(all_results)}")
             return all_results
             
         except Exception as e:
