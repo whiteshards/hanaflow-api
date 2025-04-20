@@ -118,12 +118,12 @@ async def search_manga(
 
 @app.get("/api/filters")
 async def get_filters(
-    source: str = Query(..., description="Source to get filters for (comick, nhentai, hanime)")
+    source: str = Query(..., description="Source to get filters for (comick, nhentai, hanime, hahomoe)")
 ):
     """
     Get available filters for a specific source
 
-    - **source**: The source to get filters for (comick, nhentai, hanime)
+    - **source**: The source to get filters for (comick, nhentai, hanime, hahomoe)
     """
     start_time = time.time()
 
@@ -303,11 +303,6 @@ async def get_details(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting details: {str(e)}")
-"""
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
-"""
 
 @app.get("/api/manga/get-pages")
 async def get_manga_pages(
@@ -403,7 +398,7 @@ async def get_manga_pages(
 @app.get("/api/anime/search", response_model=MangaResponse)
 async def search_anime(
     q: str = Query(..., description="Search query"),
-    source: str = Query(..., description="Source to search (hanime)"),
+    source: str = Query(..., description="Source to search (hanime, hahomoe)"),
     page: Optional[int] = Query(1, description="Page number", ge=1),
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
@@ -448,7 +443,7 @@ async def search_anime(
 
 @app.get("/api/anime/popular", response_model=MangaResponse)
 async def get_popular_anime(
-    source: str = Query(..., description="Source to fetch from (hanime)"),
+    source: str = Query(..., description="Source to fetch from (hanime,hahomoe)"),
     page: Optional[int] = Query(1, description="Page number", ge=1),
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
@@ -495,7 +490,7 @@ async def get_popular_anime(
 
 @app.get("/api/anime/latest", response_model=MangaResponse)
 async def get_latest_anime(
-    source: str = Query(..., description="Source to fetch from (hanime)"),
+    source: str = Query(..., description="Source to fetch from (hanime,hahomoe)"),
     page: Optional[int] = Query(1, description="Page number", ge=1),
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
@@ -542,13 +537,13 @@ async def get_latest_anime(
 
 @app.get("/api/anime/details")
 async def get_anime_details(
-    source: str = Query(..., description="Source to fetch from (hanime)"),
+    source: str = Query(..., description="Source to fetch from (hanime, hahomoe)"),
     id: str = Query(..., description="URL/ID of the anime")
 ):
     """
-    Get detailed information about an anime by ID from specified source
+    Get detailed information about an anime including episodes
 
-    - **source**: Source name (hanime)
+    - **source**: Source name (hanime, hahomoe)
     - **id**: URL/ID of the anime
     """
     start_time = time.time()
@@ -586,87 +581,14 @@ async def get_anime_details(
 
 @app.get("/api/anime/get-episode")
 async def get_anime_episode(
-    source: str = Query(..., description="Source to fetch from (hanime)"),
-    id: str = Query(..., description="URL/ID of the anime"),
-    #episode_url: Optional[str] = Query(None, description="URL of the specific episode (optional)")
+    source: str = Query(..., description="Source to fetch from (hanime, hahomoe)"),
+    id: str = Query(..., description="URL/ID of the anime episode")
 ):
     """
-    Get episodes or specific episode streaming links from an anime
+    Get streaming links for a specific anime episode
 
-    - **source**: Source name (hanime)
-    - **id**: URL/ID of the anime
-    - **episode_url**: Optional URL of the specific episode to get streaming links
-    """
-    start_time = time.time()
-    episode_url=id
-    # Validate source
-    if source not in anime_scrapers:
-        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
-
-    # Get the appropriate scraper
-    scraper = anime_scrapers[source]
-
-    try:
-        # If episode_url is provided, get streaming links for that specific episode
-        #if episode_url:
-            # Get video sources directly from the episode URL
-        video_sources = scraper.get_video_sources(episode_url)
-
-            # Calculate execution time
-        execution_time_ms = int((time.time() - start_time) * 1000)
-
-            # Prepare response
-        response = {
-                "source": source,
-                "id": id,
-                "episode_url": episode_url,
-                "streams": video_sources,
-                "executionTimeMs": execution_time_ms
-            }
-
-        return response
-        """
-        else:
-            # First get anime details
-            details = scraper.get_anime_details(id)
-
-            if not details:
-                raise HTTPException(status_code=404, detail=f"Anime not found: {id}")
-
-            # Get episodes
-            episodes = scraper.get_episodes(details)
-
-            # Calculate execution time
-            execution_time_ms = int((time.time() - start_time) * 1000)
-
-            # Prepare response
-            response = {
-                "source": source,
-                "id": id,
-                "title": details.get("title", ""),
-                "episodes": episodes,
-                "executionTimeMs": execution_time_ms
-            }
-
-            return response
-        """
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error getting anime episode data: {str(e)}")
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
-
-@app.get("/api/anime/get-streams")
-async def get_anime_streams(
-    source: str = Query(..., description="Source to fetch from (hanime)"),
-    episode_url: str = Query(..., description="URL of the episode")
-):
-    """
-    Get streaming links for a specific episode URL
-
-    - **source**: Source name (hanime)
-    - **episode_url**: URL of the episode to get streaming links
+    - **source**: Source name (hanime, hahomoe)
+    - **id**: URL/ID of the anime episode
     """
     start_time = time.time()
 
@@ -679,7 +601,7 @@ async def get_anime_streams(
 
     try:
         # Get video sources for the episode
-        video_sources = scraper.get_video_sources(episode_url)
+        video_sources = scraper.get_video_sources(id)
 
         # Calculate execution time
         execution_time_ms = int((time.time() - start_time) * 1000)
@@ -687,7 +609,7 @@ async def get_anime_streams(
         # Prepare response
         response = {
             "source": source,
-            "episode_url": episode_url,
+            "episode_id": id,
             "streams": video_sources,
             "executionTimeMs": execution_time_ms
         }
@@ -695,4 +617,8 @@ async def get_anime_streams(
         return response
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error getting anime streams: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting anime episode data: {str(e)}")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
