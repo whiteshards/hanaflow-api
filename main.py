@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any, List, Optional
+from anime_scrapers.hanime_scraper import HanimeScraper
 from manga_scrapers.comick import ComickScraper
 from manga_scrapers.nhentai import NHentaiScraper
 import time
@@ -8,8 +9,6 @@ import math
 from pydantic import BaseModel
 
 app = FastAPI(
-
-from anime_scrapers.hanime_scraper import HanimeScraper
 
     title="Manga Search API",
     description="API for searching manga from different sources",
@@ -295,11 +294,11 @@ async def get_details(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting details: {str(e)}")
-
+"""
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
-
+"""
 
 @app.get("/api/manga/get-pages")
 async def get_manga_pages(
@@ -525,3 +524,6 @@ async def get_latest_anime(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching latest anime: {str(e)}")
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
