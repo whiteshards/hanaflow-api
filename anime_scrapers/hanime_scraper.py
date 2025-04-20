@@ -300,7 +300,7 @@ class HanimeScraper:
             # Extract id from slug
             slug = item.get('slug', '')
             anime_list.append({
-                'id': slug,
+                'id': url,
                 'title': f"{title} [Hanime]",
                 'url': url,
                 'poster': thumbnail_url,
