@@ -594,16 +594,8 @@ async def get_anime_episode(
     try:
         # If episode_url is provided, get streaming links for that specific episode
         if episode_url:
-            # Check if the URL is already in the correct format or needs to be processed
-            if "api/v8/video?id=" in episode_url:
-                # Direct API URL is provided, use it as is
-                api_url = episode_url
-            else:
-                # Process the URL to get the API URL
-                api_url = f"{scraper.BASE_URL}/api/v8/video?id={episode_url.split('/')[-1]}"
-
-            # Get video sources for the specific episode
-            video_sources = scraper.get_video_sources(api_url)
+            # Get video sources directly from the episode URL
+            video_sources = scraper.get_video_sources(episode_url)
 
             # Calculate execution time
             execution_time_ms = int((time.time() - start_time) * 1000)
