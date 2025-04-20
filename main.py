@@ -563,7 +563,7 @@ async def get_anime_details(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting anime details: {str(e)}")
 
-@app.get("/api/anime/episodes")
+@app.get("/api/anime/get-episode")
 async def get_anime_episodes(
     source: str = Query(..., description="Source to fetch from (hanime)"),
     id: str = Query(..., description="URL/ID of the anime")
