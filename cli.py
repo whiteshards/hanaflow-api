@@ -42,14 +42,15 @@ def main_menu():
         print("5. Search on Hanime only") # Added Hanime search option
         print("6. Search manga on Comick") # Added Comick manga search option
         print("7. Search manga on NHentai") # Added NHentai search option
-        #print("8. Set Hanime Quality Preference") # Added Hanime quality setting option
-        print("8. Exit") # Updated exit option number
+        print("8. Browse popular anime on Hanime") # Added Popular Hanime option
+        print("9. Browse latest anime on Hanime") # Added Latest Hanime option
+        print("10. Exit") # Updated exit option number
 
         try:
-            choice = input("\nEnter your choice (1-8): ") # Updated choice range
+            choice = input("\nEnter your choice (1-10): ") # Updated choice range
 
-            if choice in ['1', '2', '3', '4', '5', '6', '7', '8']:
-                if choice == '8':
+            if choice in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
+                if choice == '10':
                     print("Exiting...")
                     break
 
@@ -80,6 +81,32 @@ def main_menu():
                         hanime_results = hanime_searcher.search_anime(query)
                         all_results.extend(hanime_results)
                         print(f"Found {len(hanime_results)} results from Hanime")
+                        
+                elif choice == '8':
+                    # Handle popular anime from Hanime
+                    page = 1
+                    try:
+                        page_input = input("\nEnter page number (default: 1): ").strip()
+                        if page_input and page_input.isdigit():
+                            page = int(page_input)
+                    except ValueError:
+                        page = 1
+                        
+                    all_results = hanime_searcher.get_popular_anime(page)
+                    print(f"Found {len(all_results)} popular anime from Hanime")
+                    
+                elif choice == '9':
+                    # Handle latest anime from Hanime
+                    page = 1
+                    try:
+                        page_input = input("\nEnter page number (default: 1): ").strip()
+                        if page_input and page_input.isdigit():
+                            page = int(page_input)
+                    except ValueError:
+                        page = 1
+                        
+                    all_results = hanime_searcher.get_latest_anime(page)
+                    print(f"Found {len(all_results)} latest anime from Hanime")
 
                     if choice == '5':
                         # Hanime search submenu

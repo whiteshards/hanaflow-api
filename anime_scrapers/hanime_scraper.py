@@ -621,3 +621,64 @@ class HanimeScraper:
         else:
             print(f"Invalid quality. Available options: {', '.join(self.QUALITY_LIST)}")
             return False
+            
+    def get_popular_anime(self, page=1):
+        """Get popular anime (sorted by likes)."""
+        print(f"💫 Getting popular anime from hanime (page {page})...")
+        
+        # Use the default filters (likes, desc sorting)
+        search_body = self.search_request_body("", page, None)
+        
+        try:
+            response = self.session.post(
+                self.SEARCH_URL,
+                headers=self.search_headers,
+                json=search_body,
+                timeout=15
+            )
+            response.raise_for_status()
+            
+            # Parse search results into anime list
+            results = self._parse_search_json(response.json())
+            
+            print(f"Found {len(results)} popular anime from hanime")
+            return results
+            
+        except Exception as e:
+            print(f"❌ Error getting popular anime from hanime: {e}")
+            return []
+    
+    def get_latest_anime(self, page=1):
+        """Get latest anime (sorted by published date)."""
+        print(f"🆕 Getting latest anime from hanime (page {page})...")
+        
+        # Create filters for latest anime (published_at_unix, desc)
+        latest_filters = {
+            "included_tags": [],
+            "blacklisted_tags": [],
+            "brands": [],
+            "tags_mode": "AND",
+            "order_by": "published_at_unix",
+            "ordering": "desc"
+        }
+        
+        search_body = self.search_request_body("", page, latest_filters)
+        
+        try:
+            response = self.session.post(
+                self.SEARCH_URL,
+                headers=self.search_headers,
+                json=search_body,
+                timeout=15
+            )
+            response.raise_for_status()
+            
+            # Parse search results into anime list
+            results = self._parse_search_json(response.json())
+            
+            print(f"Found {len(results)} latest anime from hanime")
+            return results
+            
+        except Exception as e:
+            print(f"❌ Error getting latest anime from hanime: {e}")
+            return []
