@@ -321,7 +321,7 @@ class HahoMoeSearcher:
                         })
                         
                         # Write to the urls.txt file
-                        url_file.write(f"{quality}: {url}\n")
+                        #url_file.write(f"{quality}: {url}\n")
                 
                 # Sort video sources by quality (highest first)
                 video_sources.sort(key=lambda x: {
@@ -331,7 +331,7 @@ class HahoMoeSearcher:
                     "360p": 1
                 }.get(x['quality'], 0), reverse=True)
                 
-                print(f"✅ Saved {len(video_sources)} stream URLs with all available qualities to urls.txt")
+                #print(f"✅ Saved {len(video_sources)} stream URLs with all available qualities to urls.txt")
             
             return video_sources
             
