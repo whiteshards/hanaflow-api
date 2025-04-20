@@ -120,18 +120,18 @@ async def get_filters(
 ):
     """
     Get available filters for a specific source
-    
+
     - **source**: The source to get filters for (comick, nhentai, hanime)
     """
     start_time = time.time()
-    
+
     # Validate all sources (manga and anime)
     all_sources = list(scrapers.keys()) + list(anime_scrapers.keys())
     unique_sources = list(dict.fromkeys(all_sources))
-    
+
     if source not in unique_sources:
         raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(unique_sources)}")
-    
+
     try:
         if source == "comick":
             from manga_scrapers.comick import ComickFilters
@@ -151,19 +151,19 @@ async def get_filters(
             }
         else:
             raise HTTPException(status_code=400, detail=f"Filters not available for source: {source}")
-        
+
         # Calculate execution time
         execution_time_ms = int((time.time() - start_time) * 1000)
-        
+
         # Prepare response
         response = {
             "source": source,
             "filters": filters,
             "executionTimeMs": execution_time_ms
         }
-        
+
         return response
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting filters: {str(e)}")
 
@@ -308,7 +308,7 @@ async def get_manga_pages(
 ):
     """
     Get pages for a specific manga or chapter
-    
+
     - **source**: Source name (nhentai, comick, etc.)
     - **id**: ID of the manga
     - **chapter_id**: Optional chapter ID for multi-chapter manga
@@ -318,7 +318,7 @@ async def get_manga_pages(
     try:
         if source == "nhentai":
             scraper = NHentaiScraper()
-            
+
             # Create a manga/chapter object with minimal info needed for the scraper
             if chapter_id:
                 # Use chapter_id if provided
@@ -329,15 +329,15 @@ async def get_manga_pages(
                 manga = {"id": id, "url": f"/g/{id}/"}
                 details = scraper.get_manga_details(manga)
                 chapters = scraper.get_chapters(details)
-                
+
                 if not chapters:
                     raise HTTPException(status_code=404, detail="No chapters found for this manga")
-                    
+
                 pages = scraper.get_pages(chapters[0])
-            
+
             # Calculate execution time
             execution_time_ms = int((time.time() - start_time) * 1000)
-            
+
             # Return pages with full URLs
             return {
                 "source": source,
@@ -346,10 +346,10 @@ async def get_manga_pages(
                 "pages": pages,
                 "executionTimeMs": execution_time_ms
             }
-            
+
         elif source == "comick":
             scraper = ComickScraper()
-            
+
             # Handle chapter pages request
             if chapter_id:
                 # Direct chapter request
@@ -359,19 +359,19 @@ async def get_manga_pages(
                 # Get manga details first
                 #manga = {"id": id, "url": f"/comic/{id}#"}
                 #details = scraper.get_manga_details(manga)
-                
+
                 # Get chapters
                 #chapter = {"id": chapter_id, "url":}
                 chapters = scraper.get_chapters(chapter_id)
                 if not chapters:
                     raise HTTPException(status_code=404, detail="No chapters found for this manga")
-                
+
                 # Get pages for first chapter
                 pages = scraper.get_pages(chapters[0])
-            
+
             # Calculate execution time
             execution_time_ms = int((time.time() - start_time) * 1000)
-            
+
             # Return pages with metadata
             return {
                 "source": source,
@@ -380,10 +380,10 @@ async def get_manga_pages(
                 "pages": pages,
                 "executionTimeMs": execution_time_ms
             }
-            
+
         else:
             raise HTTPException(status_code=400, detail=f"Unknown source: {source}")
-            
+
     except Exception as e:
         # Log the error
         print(f"Error getting pages: {str(e)}")
@@ -532,40 +532,40 @@ async def get_anime_details(
 ):
     """
     Get detailed information about an anime by ID from specified source
-    
+
     - **source**: Source name (hanime)
     - **id**: URL/ID of the anime
     """
     start_time = time.time()
-    
+
     # Validate source
     if source not in anime_scrapers:
         raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
-    
+
     # Get the appropriate scraper
     scraper = anime_scrapers[source]
-    
+
     try:
         # Get anime details
         details = scraper.get_anime_details(id)
-        
+
         if not details:
             raise HTTPException(status_code=404, detail=f"Anime not found: {id}")
-        
+
         # Get episodes for this anime
         episodes = scraper.get_episodes(details)
-        
+
         # Add episodes to details
         details["episodes"] = episodes
-        
+
         # Calculate execution time
         execution_time_ms = int((time.time() - start_time) * 1000)
-        
+
         # Add execution time to response
         details["executionTimeMs"] = execution_time_ms
-        
+
         return details
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting anime details: {str(e)}")
 
@@ -577,29 +577,37 @@ async def get_anime_episode(
 ):
     """
     Get episodes or specific episode streaming links from an anime
-    
+
     - **source**: Source name (hanime)
     - **id**: URL/ID of the anime
     - **episode_url**: Optional URL of the specific episode to get streaming links
     """
     start_time = time.time()
-    
+
     # Validate source
     if source not in anime_scrapers:
         raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
-    
+
     # Get the appropriate scraper
     scraper = anime_scrapers[source]
-    
+
     try:
         # If episode_url is provided, get streaming links for that specific episode
         if episode_url:
+            # Check if the URL is already in the correct format or needs to be processed
+            if "api/v8/video?id=" in episode_url:
+                # Direct API URL is provided, use it as is
+                api_url = episode_url
+            else:
+                # Process the URL to get the API URL
+                api_url = f"{scraper.BASE_URL}/api/v8/video?id={episode_url.split('/')[-1]}"
+
             # Get video sources for the specific episode
-            video_sources = scraper.get_video_sources(episode_url)
-            
+            video_sources = scraper.get_video_sources(api_url)
+
             # Calculate execution time
             execution_time_ms = int((time.time() - start_time) * 1000)
-            
+
             # Prepare response
             response = {
                 "source": source,
@@ -608,21 +616,21 @@ async def get_anime_episode(
                 "streams": video_sources,
                 "executionTimeMs": execution_time_ms
             }
-            
+
             return response
         else:
             # First get anime details
             details = scraper.get_anime_details(id)
-            
+
             if not details:
                 raise HTTPException(status_code=404, detail=f"Anime not found: {id}")
-            
+
             # Get episodes
             episodes = scraper.get_episodes(details)
-            
+
             # Calculate execution time
             execution_time_ms = int((time.time() - start_time) * 1000)
-            
+
             # Prepare response
             response = {
                 "source": source,
@@ -631,9 +639,9 @@ async def get_anime_episode(
                 "episodes": episodes,
                 "executionTimeMs": execution_time_ms
             }
-            
+
             return response
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting anime episode data: {str(e)}")
 if __name__ == "__main__":
@@ -647,26 +655,26 @@ async def get_anime_streams(
 ):
     """
     Get streaming links for a specific episode URL
-    
+
     - **source**: Source name (hanime)
     - **episode_url**: URL of the episode to get streaming links
     """
     start_time = time.time()
-    
+
     # Validate source
     if source not in anime_scrapers:
         raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
-    
+
     # Get the appropriate scraper
     scraper = anime_scrapers[source]
-    
+
     try:
         # Get video sources for the episode
         video_sources = scraper.get_video_sources(episode_url)
-        
+
         # Calculate execution time
         execution_time_ms = int((time.time() - start_time) * 1000)
-        
+
         # Prepare response
         response = {
             "source": source,
@@ -674,8 +682,8 @@ async def get_anime_streams(
             "streams": video_sources,
             "executionTimeMs": execution_time_ms
         }
-        
+
         return response
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting anime streams: {str(e)}")
