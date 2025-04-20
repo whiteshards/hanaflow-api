@@ -524,6 +524,91 @@ async def get_latest_anime(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching latest anime: {str(e)}")
+
+@app.get("/api/anime/details")
+async def get_anime_details(
+    source: str = Query(..., description="Source to fetch from (hanime)"),
+    id: str = Query(..., description="URL/ID of the anime")
+):
+    """
+    Get detailed information about an anime by ID from specified source
+    
+    - **source**: Source name (hanime)
+    - **id**: URL/ID of the anime
+    """
+    start_time = time.time()
+    
+    # Validate source
+    if source not in anime_scrapers:
+        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
+    
+    # Get the appropriate scraper
+    scraper = anime_scrapers[source]
+    
+    try:
+        # Get anime details
+        details = scraper.get_anime_details(id)
+        
+        if not details:
+            raise HTTPException(status_code=404, detail=f"Anime not found: {id}")
+        
+        # Calculate execution time
+        execution_time_ms = int((time.time() - start_time) * 1000)
+        
+        # Add execution time to response
+        details["executionTimeMs"] = execution_time_ms
+        
+        return details
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting anime details: {str(e)}")
+
+@app.get("/api/anime/episodes")
+async def get_anime_episodes(
+    source: str = Query(..., description="Source to fetch from (hanime)"),
+    id: str = Query(..., description="URL/ID of the anime")
+):
+    """
+    Get episodes for an anime by ID from specified source
+    
+    - **source**: Source name (hanime)
+    - **id**: URL/ID of the anime
+    """
+    start_time = time.time()
+    
+    # Validate source
+    if source not in anime_scrapers:
+        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
+    
+    # Get the appropriate scraper
+    scraper = anime_scrapers[source]
+    
+    try:
+        # First get anime details
+        details = scraper.get_anime_details(id)
+        
+        if not details:
+            raise HTTPException(status_code=404, detail=f"Anime not found: {id}")
+        
+        # Get episodes
+        episodes = scraper.get_episodes(details)
+        
+        # Calculate execution time
+        execution_time_ms = int((time.time() - start_time) * 1000)
+        
+        # Prepare response
+        response = {
+            "source": source,
+            "id": id,
+            "title": details.get("title", ""),
+            "episodes": episodes,
+            "executionTimeMs": execution_time_ms
+        }
+        
+        return response
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting anime episodes: {str(e)}")
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)

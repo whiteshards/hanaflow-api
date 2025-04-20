@@ -296,9 +296,6 @@ class HanimeScraper:
 
             slug = item.get('slug', '')
             url = f"/videos/hentai/{slug}"
-
-            # Extract id from slug
-            slug = item.get('slug', '')
             anime_list.append({
                 'id': url,
                 'title': f"{title} [Hanime]",
