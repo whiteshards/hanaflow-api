@@ -623,62 +623,90 @@ class HanimeScraper:
             return False
             
     def get_popular_anime(self, page=1):
-        """Get popular anime (sorted by likes)."""
-        print(f"💫 Getting popular anime from hanime (page {page})...")
+        """Get popular anime (sorted by likes) - returns all results without pagination."""
+        print(f"💫 Getting popular anime from hanime...")
         
-        # Use the default filters (likes, desc sorting)
-        search_body = self.search_request_body("", page, None)
+        all_results = []
+        current_page = 1
+        max_pages = 5  # Fetching up to 5 pages to get more results
         
         try:
-            response = self.session.post(
-                self.SEARCH_URL,
-                headers=self.search_headers,
-                json=search_body,
-                timeout=15
-            )
-            response.raise_for_status()
+            for current_page in range(1, max_pages + 1):
+                # Use the default filters (likes, desc sorting)
+                search_body = self.search_request_body("", current_page, None)
+                
+                response = self.session.post(
+                    self.SEARCH_URL,
+                    headers=self.search_headers,
+                    json=search_body,
+                    timeout=15
+                )
+                response.raise_for_status()
+                
+                # Parse search results into anime list
+                page_results = self._parse_search_json(response.json())
+                
+                if not page_results:
+                    break
+                    
+                all_results.extend(page_results)
+                print(f"Fetched page {current_page}, total results so far: {len(all_results)}")
+                
+                # Add a small delay to avoid rate limiting
+                time.sleep(0.5)
             
-            # Parse search results into anime list
-            results = self._parse_search_json(response.json())
-            
-            print(f"Found {len(results)} popular anime from hanime")
-            return results
+            print(f"Found {len(all_results)} popular anime from hanime")
+            return all_results
             
         except Exception as e:
             print(f"❌ Error getting popular anime from hanime: {e}")
-            return []
+            return all_results if all_results else []
     
     def get_latest_anime(self, page=1):
-        """Get latest anime (sorted by published date)."""
-        print(f"🆕 Getting latest anime from hanime (page {page})...")
+        """Get latest anime (sorted by published date) - returns all results without pagination."""
+        print(f"🆕 Getting latest anime from hanime...")
         
-        # Create filters for latest anime (published_at_unix, desc)
-        latest_filters = {
-            "included_tags": [],
-            "blacklisted_tags": [],
-            "brands": [],
-            "tags_mode": "AND",
-            "order_by": "published_at_unix",
-            "ordering": "desc"
-        }
-        
-        search_body = self.search_request_body("", page, latest_filters)
+        all_results = []
+        current_page = 1
+        max_pages = 5  # Fetching up to 5 pages to get more results
         
         try:
-            response = self.session.post(
-                self.SEARCH_URL,
-                headers=self.search_headers,
-                json=search_body,
-                timeout=15
-            )
-            response.raise_for_status()
+            for current_page in range(1, max_pages + 1):
+                # Create filters for latest anime (created_at_unix, desc)
+                latest_filters = {
+                    "included_tags": [],
+                    "blacklisted_tags": [],
+                    "brands": [],
+                    "tags_mode": "AND",
+                    "order_by": "created_at_unix",
+                    "ordering": "desc"
+                }
+                
+                search_body = self.search_request_body("", current_page, latest_filters)
+                
+                response = self.session.post(
+                    self.SEARCH_URL,
+                    headers=self.search_headers,
+                    json=search_body,
+                    timeout=15
+                )
+                response.raise_for_status()
+                
+                # Parse search results into anime list
+                page_results = self._parse_search_json(response.json())
+                
+                if not page_results:
+                    break
+                    
+                all_results.extend(page_results)
+                print(f"Fetched page {current_page}, total results so far: {len(all_results)}")
+                
+                # Add a small delay to avoid rate limiting
+                time.sleep(0.5)
             
-            # Parse search results into anime list
-            results = self._parse_search_json(response.json())
-            
-            print(f"Found {len(results)} latest anime from hanime")
-            return results
+            print(f"Found {len(all_results)} latest anime from hanime")
+            return all_results
             
         except Exception as e:
             print(f"❌ Error getting latest anime from hanime: {e}")
-            return []
+            return all_results if all_results else []

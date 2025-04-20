@@ -84,28 +84,14 @@ def main_menu():
                         
                 elif choice == '8':
                     # Handle popular anime from Hanime
-                    page = 1
-                    try:
-                        page_input = input("\nEnter page number (default: 1): ").strip()
-                        if page_input and page_input.isdigit():
-                            page = int(page_input)
-                    except ValueError:
-                        page = 1
-                        
-                    all_results = hanime_searcher.get_popular_anime(page)
+                    print("\nFetching popular anime from Hanime (this may take a moment)...")
+                    all_results = hanime_searcher.get_popular_anime()
                     print(f"Found {len(all_results)} popular anime from Hanime")
                     
                 elif choice == '9':
                     # Handle latest anime from Hanime
-                    page = 1
-                    try:
-                        page_input = input("\nEnter page number (default: 1): ").strip()
-                        if page_input and page_input.isdigit():
-                            page = int(page_input)
-                    except ValueError:
-                        page = 1
-                        
-                    all_results = hanime_searcher.get_latest_anime(page)
+                    print("\nFetching latest anime from Hanime (this may take a moment)...")
+                    all_results = hanime_searcher.get_latest_anime()
                     print(f"Found {len(all_results)} latest anime from Hanime")
 
                     if choice == '5':
