@@ -8,6 +8,9 @@ import math
 from pydantic import BaseModel
 
 app = FastAPI(
+
+from anime_scrapers.hanime_scraper import HanimeScraper
+
     title="Manga Search API",
     description="API for searching manga from different sources",
     version="1.0.0"
@@ -25,11 +28,18 @@ app.add_middleware(
 # Initialize scrapers
 comick_scraper = ComickScraper()
 nhentai_scraper = NHentaiScraper()
+hanime_scraper = HanimeScraper()
 
 # Dictionary to store scrapers by name
 scrapers = {
     "comick": comick_scraper,
-    "nhentai": nhentai_scraper
+    "nhentai": nhentai_scraper,
+    "hanime": hanime_scraper
+}
+
+# Dictionary to store anime scrapers by name
+anime_scrapers = {
+    "hanime": hanime_scraper
 }
 
 class MangaResponse(BaseModel):
@@ -107,18 +117,21 @@ async def search_manga(
 
 @app.get("/api/filters")
 async def get_filters(
-    source: str = Query(..., description="Source to get filters for (comick, nhentai)")
+    source: str = Query(..., description="Source to get filters for (comick, nhentai, hanime)")
 ):
     """
     Get available filters for a specific source
     
-    - **source**: The source to get filters for (comick, nhentai)
+    - **source**: The source to get filters for (comick, nhentai, hanime)
     """
     start_time = time.time()
     
-    # Validate source
-    if source not in scrapers:
-        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(scrapers.keys())}")
+    # Validate all sources (manga and anime)
+    all_sources = list(scrapers.keys()) + list(anime_scrapers.keys())
+    unique_sources = list(dict.fromkeys(all_sources))
+    
+    if source not in unique_sources:
+        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(unique_sources)}")
     
     try:
         if source == "comick":
@@ -126,6 +139,17 @@ async def get_filters(
             filters = ComickFilters.get_filters()
         elif source == "nhentai":
             filters = nhentai_scraper.get_filters()
+        elif source == "hanime":
+            filters = {
+                "tags": [{"id": tag["id"], "name": tag["name"]} for tag in hanime_scraper.get_tags()],
+                "brands": [{"id": brand["id"], "name": brand["name"]} for brand in hanime_scraper.get_brands()],
+                "sorts": [{"title": sort[0], "value": sort[1]} for sort in hanime_scraper.get_sortable_list()],
+                "tagsModes": [
+                    {"title": "All tags must match (AND)", "value": "AND"},
+                    {"title": "Any tag can match (OR)", "value": "OR"}
+                ],
+                "quality": hanime_scraper.QUALITY_LIST
+            }
         else:
             raise HTTPException(status_code=400, detail=f"Filters not available for source: {source}")
         
@@ -366,3 +390,138 @@ async def get_manga_pages(
         print(f"Error getting pages: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error getting pages: {str(e)}")
 
+
+
+@app.get("/api/anime/search", response_model=MangaResponse)
+async def search_anime(
+    q: str = Query(..., description="Search query"),
+    source: str = Query(..., description="Source to search (hanime)"),
+    page: Optional[int] = Query(1, description="Page number", ge=1),
+    limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
+):
+    start_time = time.time()
+
+    # Validate source
+    if source not in anime_scrapers:
+        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
+
+    # Get the appropriate scraper
+    scraper = anime_scrapers[source]
+
+    try:
+        # Search anime
+        results = scraper.search_anime(q)
+
+        # Add source to each result
+        for result in results:
+            result["source"] = source
+
+        # Paginate results
+        paginated_results = paginate_results(results, page, limit)
+
+        # Calculate execution time
+        execution_time_ms = int((time.time() - start_time) * 1000)
+
+        # Prepare response
+        response = {
+            "totalResults": len(results),
+            "page": page,
+            "limit": limit,
+            "source": source,
+            "query": q,
+            "results": paginated_results,
+            "executionTimeMs": execution_time_ms
+        }
+
+        return response
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error searching anime: {str(e)}")
+
+@app.get("/api/anime/popular", response_model=MangaResponse)
+async def get_popular_anime(
+    source: str = Query(..., description="Source to fetch from (hanime)"),
+    page: Optional[int] = Query(1, description="Page number", ge=1),
+    limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
+):
+    start_time = time.time()
+
+    # Validate source
+    if source not in anime_scrapers:
+        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
+
+    # Get the appropriate scraper
+    scraper = anime_scrapers[source]
+
+    try:
+        # Get popular anime
+        results = scraper.get_popular_anime()
+
+        # Add source to each result
+        for result in results:
+            result["source"] = source
+
+        # Paginate results
+        paginated_results = paginate_results(results, page, limit)
+
+        # Calculate execution time
+        execution_time_ms = int((time.time() - start_time) * 1000)
+
+        # Prepare response
+        response = {
+            "totalResults": len(results),
+            "page": page,
+            "limit": limit,
+            "source": source,
+            "results": paginated_results,
+            "executionTimeMs": execution_time_ms
+        }
+
+        return response
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching popular anime: {str(e)}")
+
+@app.get("/api/anime/latest", response_model=MangaResponse)
+async def get_latest_anime(
+    source: str = Query(..., description="Source to fetch from (hanime)"),
+    page: Optional[int] = Query(1, description="Page number", ge=1),
+    limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
+):
+    start_time = time.time()
+
+    # Validate source
+    if source not in anime_scrapers:
+        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
+
+    # Get the appropriate scraper
+    scraper = anime_scrapers[source]
+
+    try:
+        # Get latest anime
+        results = scraper.get_latest_anime()
+
+        # Add source to each result
+        for result in results:
+            result["source"] = source
+
+        # Paginate results
+        paginated_results = paginate_results(results, page, limit)
+
+        # Calculate execution time
+        execution_time_ms = int((time.time() - start_time) * 1000)
+
+        # Prepare response
+        response = {
+            "totalResults": len(results),
+            "page": page,
+            "limit": limit,
+            "source": source,
+            "results": paginated_results,
+            "executionTimeMs": execution_time_ms
+        }
+
+        return response
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching latest anime: {str(e)}")
