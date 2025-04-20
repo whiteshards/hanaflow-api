@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import sys
 import time
 import urllib.parse
+import re
+from typing import Dict, Any, List, Optional
 
 class HahoMoeSearcher:
     def __init__(self):
@@ -16,17 +18,51 @@ class HahoMoeSearcher:
         
         # Set cookie for thumbnails
         self.session.cookies.set('loop-view', 'thumb', domain='haho.moe')
+        
+        # Set up filters (similar to HanimeScraper)
+        self.active_filters = {
+            "included_tags": [],
+            "excluded_tags": [],
+            "order_by": "vdy",  # Default to popularity (views)
+            "ordering": "-d"    # Descending order
+        }
+        
+        # Preferences for quality
+        self.preferences = {
+            "preferred_quality": "720p"  # Default preferred quality
+        }
+        
+        # Quality options
+        self.quality_list = ["1080p", "720p", "480p", "360p"]
 
     def search_anime(self, query):
         """Search for anime on HahoMoe by title"""
         try:
             print(f"🔍 Searching for '{query}' on HahoMoe...")
             
+            # Build search parameters from active filters
+            search_params = self._get_search_parameters()
+            order_by, ordering = search_params[2], search_params[3]
+            sort_param = f"{order_by}{ordering}"
+            
             # Encode the query for the URL
             encoded_query = urllib.parse.quote(query)
             
             # Create the search URL with params
-            url = f"{self.search_url}?page=1&s=vdy-d&q={encoded_query}"
+            url = f"{self.search_url}?page=1&s={sort_param}&q={encoded_query}"
+            
+            # Add tag filters if present
+            http_query = ""
+            if self.active_filters["included_tags"]:
+                included_tags = " ".join([f'genre:{tag}' for tag in self.active_filters["included_tags"]])
+                http_query += f" {included_tags}"
+            
+            if self.active_filters["excluded_tags"]:
+                excluded_tags = " ".join([f'-genre:{tag}' for tag in self.active_filters["excluded_tags"]])
+                http_query += f" {excluded_tags}"
+            
+            if http_query:
+                url += f"&q={urllib.parse.quote(http_query.strip())}"
             
             response = self.session.get(url, headers=self.headers)
             
@@ -67,8 +103,9 @@ class HahoMoeSearcher:
                         if year_elem:
                             year = year_elem.text.strip()
                     
-                    # Add source identifier to differentiate from HiAnime results
+                    # Add source identifier to differentiate from other results
                     results.append({
+                        'id': url.split('/')[-1],
                         'title': f"{title} [HahoMoe]",
                         'url': full_url + "?s=srt-d",  # Add sort parameter
                         'poster': poster,
@@ -338,3 +375,260 @@ class HahoMoeSearcher:
         except Exception as e:
             print(f"❌ Failed to get video sources from HahoMoe: {e}")
             return []
+
+    # === New methods for filtering and sorting ===
+    
+    def _get_search_parameters(self, filters=None):
+        """Extract search parameters from filters, similar to HanimeScraper"""
+        # Use active filters if no filters are provided
+        if not filters:
+            return (
+                self.active_filters["included_tags"],
+                self.active_filters["excluded_tags"],
+                self.active_filters["order_by"],
+                self.active_filters["ordering"]
+            )
+
+        # Otherwise process the provided filters
+        included_tags = []
+        excluded_tags = []
+        order_by = self.active_filters["order_by"]
+        ordering = self.active_filters["ordering"]
+
+        # Process filter dict
+        if isinstance(filters, dict):
+            # Process tags
+            if "included_tags" in filters:
+                included_tags = filters["included_tags"]
+
+            # Process excluded tags
+            if "excluded_tags" in filters:
+                excluded_tags = filters["excluded_tags"]
+
+            # Process ordering
+            if "order_by" in filters:
+                order_by = filters["order_by"]
+
+            if "ordering" in filters:
+                ordering = filters["ordering"]
+
+        return (included_tags, excluded_tags, order_by, ordering)
+    
+    def set_tag_filter(self, tag_name, state):
+        """
+        Set a tag filter with one of three states:
+        - 1: include the tag
+        - 0: neutral (default)
+        - -1: exclude/blacklist the tag
+        """
+        # First remove the tag from both lists to avoid duplication
+        if tag_name in self.active_filters["included_tags"]:
+            self.active_filters["included_tags"].remove(tag_name)
+
+        if tag_name in self.active_filters["excluded_tags"]:
+            self.active_filters["excluded_tags"].remove(tag_name)
+
+        # Then add it to the appropriate list based on state
+        if state == 1:
+            self.active_filters["included_tags"].append(tag_name)
+        elif state == -1:
+            self.active_filters["excluded_tags"].append(tag_name)
+
+        print(f"Tag '{tag_name}' filter set to state: {state}")
+        return True
+    
+    def set_sort_order(self, order_by, ascending=False):
+        """Set sort order for results"""
+        valid_options = {"vdy": "Views", "rel": "Release date", "srt": "Sort"}
+        
+        if order_by in valid_options:
+            self.active_filters["order_by"] = order_by
+            self.active_filters["ordering"] = "-a" if ascending else "-d"
+            sort_description = valid_options.get(order_by, order_by)
+            order_description = "ascending" if ascending else "descending"
+            print(f"Sort order set to: {sort_description} ({order_description})")
+            return True
+        return False
+    
+    def clear_filters(self):
+        """Reset all filters to default values"""
+        self.active_filters = {
+            "included_tags": [],
+            "excluded_tags": [],
+            "order_by": "vdy",
+            "ordering": "-d"
+        }
+        print("All filters have been reset")
+        return True
+    
+    def set_quality(self, quality):
+        """Set preferred video quality"""
+        if quality in self.quality_list:
+            self.preferences["preferred_quality"] = quality
+            print(f"Quality preference set to: {quality}")
+            return True
+        else:
+            print(f"Invalid quality. Available options: {', '.join(self.quality_list)}")
+            return False
+    
+    def get_popular_anime(self, page=1):
+        """Get popular anime (sorted by views)"""
+        print(f"💫 Getting popular anime from HahoMoe (page {page})...")
+        
+        all_results = []
+        
+        try:
+            # Use views descending for popular
+            self.active_filters["order_by"] = "vdy"
+            self.active_filters["ordering"] = "-d"
+            
+            # Popular anime URL
+            url = f"{self.base_url}/anime?s=vdy-d&page={page}"
+            
+            response = self.session.get(url, headers=self.headers)
+            
+            if response.status_code != 200:
+                print(f"❌ Failed to get popular anime: Status code {response.status_code}")
+                return []
+            
+            soup = BeautifulSoup(response.text, 'html.parser')
+            anime_elements = soup.select('ul.anime-loop.loop > li > a')
+            
+            for anime in anime_elements:
+                try:
+                    title_elem = anime.select_one('div.label > span, div span.thumb-title')
+                    title = title_elem.text.strip() if title_elem else "Unknown Title"
+                    url = anime.get('href')
+                    full_url = self.base_url + url if not url.startswith('http') else url
+                    
+                    # Get the poster image
+                    poster_elem = anime.select_one('img')
+                    poster = poster_elem.get('src') if poster_elem else "No poster available"
+                    
+                    # Try to get type and year if available
+                    additional_info = anime.select_one('div.fd-infor')
+                    anime_type = "Unknown"
+                    year = "Unknown"
+                    
+                    if additional_info:
+                        type_elem = additional_info.select_one('.fdi-item:nth-child(1)')
+                        year_elem = additional_info.select_one('.fdi-item:nth-child(2)')
+                        
+                        if type_elem:
+                            anime_type = type_elem.text.strip()
+                        if year_elem:
+                            year = year_elem.text.strip()
+                    
+                    all_results.append({
+                        'id': url.split('/')[-1],
+                        'title': f"{title} [HahoMoe]",
+                        'url': full_url + "?s=srt-d",
+                        'poster': poster,
+                        'type': anime_type,
+                        'year': year,
+                        'source': 'hahomoe'
+                    })
+                except Exception as e:
+                    print(f"Error processing popular anime result: {e}")
+                    continue
+            
+            print(f"Found {len(all_results)} popular anime from HahoMoe")
+            return all_results
+            
+        except Exception as e:
+            print(f"❌ Error getting popular anime from HahoMoe: {e}")
+            return []
+    
+    def get_latest_anime(self, page=1):
+        """Get latest anime (sorted by release date)"""
+        print(f"🆕 Getting latest anime from HahoMoe (page {page})...")
+        
+        all_results = []
+        
+        try:
+            # Latest anime URL (sorted by release date)
+            url = f"{self.base_url}/anime?s=rel-d&page={page}"
+            
+            response = self.session.get(url, headers=self.headers)
+            
+            if response.status_code != 200:
+                print(f"❌ Failed to get latest anime: Status code {response.status_code}")
+                return []
+            
+            soup = BeautifulSoup(response.text, 'html.parser')
+            anime_elements = soup.select('ul.anime-loop.loop > li > a')
+            
+            for anime in anime_elements:
+                try:
+                    title_elem = anime.select_one('div.label > span, div span.thumb-title')
+                    title = title_elem.text.strip() if title_elem else "Unknown Title"
+                    url = anime.get('href')
+                    full_url = self.base_url + url if not url.startswith('http') else url
+                    
+                    # Get the poster image
+                    poster_elem = anime.select_one('img')
+                    poster = poster_elem.get('src') if poster_elem else "No poster available"
+                    
+                    # Try to get type and year if available
+                    additional_info = anime.select_one('div.fd-infor')
+                    anime_type = "Unknown"
+                    year = "Unknown"
+                    
+                    if additional_info:
+                        type_elem = additional_info.select_one('.fdi-item:nth-child(1)')
+                        year_elem = additional_info.select_one('.fdi-item:nth-child(2)')
+                        
+                        if type_elem:
+                            anime_type = type_elem.text.strip()
+                        if year_elem:
+                            year = year_elem.text.strip()
+                    
+                    all_results.append({
+                        'id': url.split('/')[-1],
+                        'title': f"{title} [HahoMoe]",
+                        'url': full_url + "?s=srt-d",
+                        'poster': poster,
+                        'type': anime_type,
+                        'year': year,
+                        'source': 'hahomoe'
+                    })
+                except Exception as e:
+                    print(f"Error processing latest anime result: {e}")
+                    continue
+            
+            print(f"Found {len(all_results)} latest anime from HahoMoe")
+            return all_results
+            
+        except Exception as e:
+            print(f"❌ Error getting latest anime from HahoMoe: {e}")
+            return []
+    
+    def get_tags(self):
+        """Get available tags/genres from HahoMoe"""
+        # Note: Would need to be implemented by scraping the site
+        # This is a simplified placeholder version
+        return [
+            {"id": "action", "name": "Action"},
+            {"id": "adventure", "name": "Adventure"},
+            {"id": "comedy", "name": "Comedy"},
+            {"id": "drama", "name": "Drama"},
+            {"id": "ecchi", "name": "Ecchi"},
+            {"id": "fantasy", "name": "Fantasy"},
+            {"id": "horror", "name": "Horror"},
+            {"id": "magic", "name": "Magic"},
+            {"id": "mystery", "name": "Mystery"},
+            {"id": "psychological", "name": "Psychological"},
+            {"id": "romance", "name": "Romance"},
+            {"id": "sci-fi", "name": "Sci-Fi"},
+            {"id": "slice-of-life", "name": "Slice of Life"},
+            {"id": "supernatural", "name": "Supernatural"},
+            {"id": "thriller", "name": "Thriller"}
+        ]
+    
+    def get_sortable_list(self):
+        """Get sortable options"""
+        return [
+            ("Views", "vdy"),
+            ("Release Date", "rel"),
+            ("Sort", "srt")
+        ]
