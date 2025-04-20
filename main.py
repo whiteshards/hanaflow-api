@@ -573,7 +573,7 @@ async def get_anime_details(
 async def get_anime_episode(
     source: str = Query(..., description="Source to fetch from (hanime)"),
     id: str = Query(..., description="URL/ID of the anime"),
-    episode_url: Optional[str] = Query(None, description="URL of the specific episode (optional)")
+    #episode_url: Optional[str] = Query(None, description="URL of the specific episode (optional)")
 ):
     """
     Get episodes or specific episode streaming links from an anime
@@ -583,7 +583,7 @@ async def get_anime_episode(
     - **episode_url**: Optional URL of the specific episode to get streaming links
     """
     start_time = time.time()
-
+    episode_url=id
     # Validate source
     if source not in anime_scrapers:
         raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
@@ -593,15 +593,15 @@ async def get_anime_episode(
 
     try:
         # If episode_url is provided, get streaming links for that specific episode
-        if episode_url:
+        #if episode_url:
             # Get video sources directly from the episode URL
-            video_sources = scraper.get_video_sources(episode_url)
+        video_sources = scraper.get_video_sources(episode_url)
 
             # Calculate execution time
-            execution_time_ms = int((time.time() - start_time) * 1000)
+        execution_time_ms = int((time.time() - start_time) * 1000)
 
             # Prepare response
-            response = {
+        response = {
                 "source": source,
                 "id": id,
                 "episode_url": episode_url,
@@ -609,7 +609,8 @@ async def get_anime_episode(
                 "executionTimeMs": execution_time_ms
             }
 
-            return response
+        return response
+        """
         else:
             # First get anime details
             details = scraper.get_anime_details(id)
@@ -633,6 +634,7 @@ async def get_anime_episode(
             }
 
             return response
+        """
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting anime episode data: {str(e)}")
