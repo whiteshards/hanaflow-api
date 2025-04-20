@@ -627,12 +627,14 @@ class HanimeScraper:
         print(f"💫 Getting popular anime from hanime...")
         
         all_results = []
-        current_page = 1
         max_pages = 5  # Fetching up to 5 pages to get more results
         
         try:
+            # Use the default filters (likes, desc sorting)
+            self.active_filters["order_by"] = "likes"
+            self.active_filters["ordering"] = "desc"
+            
             for current_page in range(1, max_pages + 1):
-                # Use the default filters (likes, desc sorting)
                 search_body = self.search_request_body("", current_page, None)
                 
                 response = self.session.post(
@@ -667,21 +669,20 @@ class HanimeScraper:
         print(f"🆕 Getting latest anime from hanime...")
         
         all_results = []
-        current_page = 1
         max_pages = 5  # Fetching up to 5 pages to get more results
         
         try:
+            # Create filters for latest anime (created_at_unix, desc)
+            latest_filters = {
+                "included_tags": [],
+                "blacklisted_tags": [],
+                "brands": [],
+                "tags_mode": "AND",
+                "order_by": "created_at_unix",
+                "ordering": "desc"
+            }
+            
             for current_page in range(1, max_pages + 1):
-                # Create filters for latest anime (created_at_unix, desc)
-                latest_filters = {
-                    "included_tags": [],
-                    "blacklisted_tags": [],
-                    "brands": [],
-                    "tags_mode": "AND",
-                    "order_by": "created_at_unix",
-                    "ordering": "desc"
-                }
-                
                 search_body = self.search_request_body("", current_page, latest_filters)
                 
                 response = self.session.post(

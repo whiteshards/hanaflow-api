@@ -88,11 +88,23 @@ def main_menu():
                     all_results = hanime_searcher.get_popular_anime()
                     print(f"Found {len(all_results)} popular anime from Hanime")
                     
+                    # Display search results
+                    if all_results:
+                        print(f"\nPopular anime from Hanime:")
+                        for i, result in enumerate(all_results, 1):
+                            print(f"{i}. {result.get('title')}")
+                    
                 elif choice == '9':
                     # Handle latest anime from Hanime
                     print("\nFetching latest anime from Hanime (this may take a moment)...")
                     all_results = hanime_searcher.get_latest_anime()
                     print(f"Found {len(all_results)} latest anime from Hanime")
+                    
+                    # Display search results
+                    if all_results:
+                        print(f"\nLatest anime from Hanime:")
+                        for i, result in enumerate(all_results, 1):
+                            print(f"{i}. {result.get('title')}")
 
                     if choice == '5':
                         # Hanime search submenu
