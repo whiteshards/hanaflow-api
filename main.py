@@ -2,7 +2,6 @@ from fastapi import FastAPI, HTTPException, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any, List, Optional
 from anime_scrapers.hanime_scraper import HanimeScraper
-from anime_scrapers.hahomoe_scraper import HahoMoeSearcher
 from manga_scrapers.comick import ComickScraper
 from manga_scrapers.nhentai import NHentaiScraper
 import time
@@ -29,20 +28,17 @@ app.add_middleware(
 comick_scraper = ComickScraper()
 nhentai_scraper = NHentaiScraper()
 hanime_scraper = HanimeScraper()
-hahomoe_scraper = HahoMoeSearcher()
 
 # Dictionary to store scrapers by name
 scrapers = {
     "comick": comick_scraper,
     "nhentai": nhentai_scraper,
-    "hanime": hanime_scraper,
-    "hahomoe": hahomoe_scraper
+    "hanime": hanime_scraper
 }
 
 # Dictionary to store anime scrapers by name
 anime_scrapers = {
-    "hanime": hanime_scraper,
-    "hahomoe": hahomoe_scraper
+    "hanime": hanime_scraper
 }
 
 class MangaResponse(BaseModel):
@@ -120,12 +116,12 @@ async def search_manga(
 
 @app.get("/api/filters")
 async def get_filters(
-    source: str = Query(..., description="Source to get filters for (comick, nhentai, hanime, hahomoe)")
+    source: str = Query(..., description="Source to get filters for (comick, nhentai, hanime)")
 ):
     """
     Get available filters for a specific source
 
-    - **source**: The source to get filters for (comick, nhentai, hanime, hahomoe)
+    - **source**: The source to get filters for (comick, nhentai, hanime)
     """
     start_time = time.time()
 
@@ -153,8 +149,6 @@ async def get_filters(
                 ],
                 "quality": hanime_scraper.QUALITY_LIST
             }
-        elif source == "hahomoe":
-            filters = hahomoe_scraper.get_filters()
         else:
             raise HTTPException(status_code=400, detail=f"Filters not available for source: {source}")
 
