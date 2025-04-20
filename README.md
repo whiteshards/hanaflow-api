@@ -1,4 +1,3 @@
-
 # Anime & Manga API
 
 A FastAPI-based API for fetching anime and manga data from various sources.
@@ -7,7 +6,7 @@ A FastAPI-based API for fetching anime and manga data from various sources.
 
 This API provides endpoints to search, browse, and fetch detailed information about anime and manga from different sources. Currently supported sources:
 
-- **Anime**: Hanime
+- **Anime**: Hanime, HahoMoe
 - **Manga**: Comick, NHentai
 
 ## API Endpoints
@@ -63,7 +62,7 @@ First, use one of the following endpoints to get a list of anime:
 Using the ID/URL from the previous step, fetch detailed information including all episodes:
 
 ```
-GET /api/anime/details?source=hanime&id=/videos/hentai/anime-slug
+GET /api/anime/details?source=hanime|hahomoe&id=/videos/hentai/anime-slug
 ```
 
 **Response Structure**:
@@ -97,7 +96,7 @@ GET /api/anime/details?source=hanime&id=/videos/hentai/anime-slug
 Finally, use the episode URL to get streaming links:
 
 ```
-GET /api/anime/get-episode?source=hanime&id=https://hanime.tv/api/v8/video?id=12345
+GET /api/anime/get-episode?source=hanime|hahomoe&id=https://hanime.tv/api/v8/video?id=12345
 ```
 
 **Response Structure**:
@@ -171,12 +170,12 @@ GET /api/filters?source=hanime
 
 2. **Second Request**: Get details for a specific anime using its ID/URL to obtain the episode list
    ```
-   GET /api/anime/details?source=hanime&id=/videos/hentai/anime-slug
+   GET /api/anime/details?source=hanime|hahomoe&id=/videos/hentai/anime-slug
    ```
 
 3. **Third Request**: Get streaming links for a specific episode using its URL
    ```
-   GET /api/anime/get-episode?source=hanime&id=https://hanime.tv/api/v8/video?id=12345
+   GET /api/anime/get-episode?source=hanime|hahomoe&id=https://hanime.tv/api/v8/video?id=12345
    ```
 
 ### Manga Workflow
@@ -199,7 +198,7 @@ GET /api/filters?source=hanime
 ## Notes
 
 - All endpoints support pagination with `page` and `limit` parameters
-- The `source` parameter specifies which source to use (currently supported: `hanime`, `comick`, `nhentai`)
+- The `source` parameter specifies which source to use (currently supported: `hanime`, `comick`, `nhentai`, `hahomoe`)
 - The API calculates execution time which is included in all responses
 
 ## Running the API
