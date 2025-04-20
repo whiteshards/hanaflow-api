@@ -647,7 +647,7 @@ class HanimeScraper:
 
                 # Debug the response data
                 response_data = response.json()
-                print(f"API Response hits sample: {response_data.get('hits', '')[:100]}...")
+                print(f"API Response hits sample: {response_data.get('hits', '')}...")
 
                 # Parse search results into anime list
                 page_results = self._parse_search_json(response_data)
