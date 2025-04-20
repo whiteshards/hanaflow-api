@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any, List, Optional
 from anime_scrapers.hanime_scraper import HanimeScraper
+from anime_scrapers.hahomoe_scraper import HahoMoeSearcher
 from manga_scrapers.comick import ComickScraper
 from manga_scrapers.nhentai import NHentaiScraper
 import time
@@ -38,7 +39,8 @@ scrapers = {
 
 # Dictionary to store anime scrapers by name
 anime_scrapers = {
-    "hanime": hanime_scraper
+    "hanime": hanime_scraper,
+    "hahomoe": HahoMoeSearcher()
 }
 
 class MangaResponse(BaseModel):
@@ -148,6 +150,13 @@ async def get_filters(
                     {"title": "Any tag can match (OR)", "value": "OR"}
                 ],
                 "quality": hanime_scraper.QUALITY_LIST
+            }
+        elif source == "hahomoe":
+            hahomoe_scraper = anime_scrapers["hahomoe"]
+            filters = {
+                "tags": [{"id": tag["id"], "name": tag["name"]} for tag in hahomoe_scraper.get_tags()],
+                "sorts": [{"title": sort[0], "value": sort[1]} for sort in hahomoe_scraper.get_sortable_list()],
+                "quality": hahomoe_scraper.quality_list
             }
         else:
             raise HTTPException(status_code=400, detail=f"Filters not available for source: {source}")
@@ -454,7 +463,10 @@ async def get_popular_anime(
 
     try:
         # Get popular anime
-        results = scraper.get_popular_anime()
+        if source == "hahomoe":
+            results = scraper.get_popular_anime(page)
+        else:
+            results = scraper.get_popular_anime()
 
         # Add source to each result
         for result in results:
@@ -498,7 +510,10 @@ async def get_latest_anime(
 
     try:
         # Get latest anime
-        results = scraper.get_latest_anime()
+        if source == "hahomoe":
+            results = scraper.get_latest_anime(page)
+        else:
+            results = scraper.get_latest_anime()
 
         # Add source to each result
         for result in results:
