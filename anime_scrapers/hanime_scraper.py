@@ -26,11 +26,11 @@ class HanimeScraper:
     PAGE_SIZE = 26
     SEARCH_URL = "https://search.htv-services.com/"
     BASE_URL = "https://hanime.tv"
-    
+
     # Preferences
     QUALITY_LIST = ["1080p", "720p", "480p", "360p"]
     PREF_QUALITY_DEFAULT = "1080p"
-    
+
     def __init__(self):
         self.session = requests.Session()
         self.auth_cookie = None
@@ -51,12 +51,12 @@ class HanimeScraper:
             "order_by": "likes",
             "ordering": "desc"
         }
-        
+
         # Mimicking the preferences from the Kotlin code
         self.preferences = {
             "preferred_quality": self.PREF_QUALITY_DEFAULT
         }
-        
+
         # Load all available tags
         self.available_tags = self.get_tags()
         self.available_brands = self.get_brands()
@@ -79,7 +79,7 @@ class HanimeScraper:
         # If filters are implemented, extract parameters here
         search_params = self._get_search_parameters(filters)
         included_tags, blacklisted_tags, brands, tags_mode, order_by, ordering = search_params
-        
+
         return {
             "search_text": query,
             "tags": included_tags,
@@ -103,7 +103,7 @@ class HanimeScraper:
                 self.active_filters["order_by"],
                 self.active_filters["ordering"]
             )
-            
+
         # Otherwise process the provided filters
         included_tags = []
         blacklisted_tags = []
@@ -111,34 +111,34 @@ class HanimeScraper:
         tags_mode = self.active_filters["tags_mode"]
         order_by = self.active_filters["order_by"]
         ordering = self.active_filters["ordering"]
-        
+
         # Process filter dict
         if isinstance(filters, dict):
             # Process tags
             if "included_tags" in filters:
                 included_tags = [f'"{tag.lower()}"' for tag in filters["included_tags"]]
-            
+
             # Process blacklisted tags
             if "blacklisted_tags" in filters:
                 blacklisted_tags = [f'"{tag.lower()}"' for tag in filters["blacklisted_tags"]]
-            
+
             # Process brands
             if "brands" in filters:
                 brands = [f'"{brand.lower()}"' for brand in filters["brands"]]
-            
+
             # Process tag mode
             if "tags_mode" in filters:
                 tags_mode = filters["tags_mode"].upper()
-            
+
             # Process ordering
             if "order_by" in filters:
                 order_by = filters["order_by"]
-            
+
             if "ordering" in filters:
                 ordering = filters["ordering"]
-        
+
         return (included_tags, blacklisted_tags, brands, tags_mode, order_by, ordering)
-    
+
     def set_tag_filter(self, tag_name, state):
         """
         Set a tag filter with one of three states:
@@ -148,41 +148,41 @@ class HanimeScraper:
         """
         # Convert tag name to match the format expected by the API
         tag_name = tag_name.upper()
-        
+
         # First remove the tag from both lists to avoid duplication
         if f'"{tag_name.lower()}"' in self.active_filters["included_tags"]:
             self.active_filters["included_tags"].remove(f'"{tag_name.lower()}"')
-        
+
         if f'"{tag_name.lower()}"' in self.active_filters["blacklisted_tags"]:
             self.active_filters["blacklisted_tags"].remove(f'"{tag_name.lower()}"')
-        
+
         # Then add it to the appropriate list based on state
         if state == 1:
             self.active_filters["included_tags"].append(f'"{tag_name.lower()}"')
         elif state == -1:
             self.active_filters["blacklisted_tags"].append(f'"{tag_name.lower()}"')
-        
+
         print(f"Tag '{tag_name}' filter set to state: {state}")
         return True
-    
+
     def set_brand_filter(self, brand_name, enabled=True):
         """
         Enable or disable a brand/production company filter
         """
         # Convert to the format expected by the API
         formatted_brand = f'"{brand_name.lower()}"'
-        
+
         # First remove it if it exists
         if formatted_brand in self.active_filters["brands"]:
             self.active_filters["brands"].remove(formatted_brand)
-        
+
         # Then add it if enabled
         if enabled:
             self.active_filters["brands"].append(formatted_brand)
-            
+
         print(f"Brand '{brand_name}' filter set to: {enabled}")
         return True
-    
+
     def set_tag_mode(self, mode):
         """Set tag inclusion mode (AND/OR)"""
         if mode.upper() in ["AND", "OR"]:
@@ -190,7 +190,7 @@ class HanimeScraper:
             print(f"Tag mode set to: {mode.upper()}")
             return True
         return False
-    
+
     def set_sort_order(self, order_by, ascending=False):
         """Set sort order"""
         # Validate order_by against available options
@@ -201,7 +201,7 @@ class HanimeScraper:
             print(f"Sort order set to: {order_by} ({self.active_filters['ordering']})")
             return True
         return False
-    
+
     def clear_filters(self):
         """Reset all filters to default values"""
         self.active_filters = {
@@ -238,7 +238,7 @@ class HanimeScraper:
     def search_anime(self, query="", page=1, filters=None):
         """Search for anime, similar to Kotlin's searchAnime."""
         print(f"🔍 Searching hanime for: '{query}'")
-        
+
         results = []
         try:
             data = {
@@ -246,7 +246,7 @@ class HanimeScraper:
                 "query": ""
             }
             data = self.search_request_body(query, page, filters)
-            
+
             response = self.session.post(
                 self.SEARCH_URL,
                 headers=self.search_headers,
@@ -254,13 +254,13 @@ class HanimeScraper:
                 timeout=15
             )
             response.raise_for_status()
-            
+
             # Parse search results into anime list
             results = self._parse_search_json(response.json())
-            
+
             print(f"Found {len(results)} results from hanime")
             return results
-            
+
         except Exception as e:
             print(f"❌ Error searching hanime: {e}")
             return []
@@ -268,20 +268,20 @@ class HanimeScraper:
     def _parse_search_json(self, response_data):
         """Parse search JSON response similar to Kotlin's parseSearchJson."""
         anime_list = []
-        
+
         if not response_data:
             return anime_list
-            
+
         response = response_data
         array = json.loads(response.get('hits', '[]'))
-        
+
         # Group by title and take first item of each group
         grouped_items = {}
         for item in array:
             title = self._get_title(item.get('name', ''))
             if title not in grouped_items:
                 grouped_items[title] = item
-                
+
         for item in grouped_items.values():
             title = self._get_title(item.get('name', ''))
             thumbnail_url = item.get('coverUrl')
@@ -290,13 +290,13 @@ class HanimeScraper:
             if description:
                 # Remove HTML tags
                 description = re.sub(r'<[^>]*>', '', description)
-                
+
             genres = item.get('tags', [])
             genre_text = ", ".join(genres) if genres else ""
-            
+
             slug = item.get('slug', '')
             url = f"/videos/hentai/{slug}"
-            
+
             anime_list.append({
                 'title': f"{title} [Hanime]",
                 'url': url,
@@ -306,35 +306,35 @@ class HanimeScraper:
                 'genres': genre_text,
                 'source': 'hanime',
             })
-            
+
         # Check for pagination
         has_next_page = response.get('page', 0) < response.get('nbPages', 1) - 1
-        
+
         return anime_list
 
     def get_anime_details(self, url):
         """Get anime details, similar to Kotlin's animeDetailsParse."""
         print(f"📊 Getting anime details from hanime for URL: {url}")
-        
+
         try:
             full_url = f"{self.BASE_URL}{url}"
             response = self.session.get(full_url, headers=self.headers, timeout=15)
             response.raise_for_status()
-            
+
             soup = BeautifulSoup(response.text, 'html.parser')
-            
+
             title = self._get_title(soup.select_one("h1.tv-title").text)
             thumbnail_url = soup.select_one("img.hvpi-cover").get("src")
             author = soup.select_one("a.hvpimbc-text").text if soup.select_one("a.hvpimbc-text") else ""
-            
+
             # Get description
             description_elements = soup.select("div.hvpist-description p")
             description = "\n\n".join([el.text for el in description_elements]) if description_elements else ""
-            
+
             # Get genres
             genre_elements = soup.select("div.hvpis-text div.btn__content")
             genres = ", ".join([el.text for el in genre_elements]) if genre_elements else ""
-            
+
             return {
                 'title': title,
                 'url': url,
@@ -347,7 +347,7 @@ class HanimeScraper:
                 },
                 'source': 'hanime'
             }
-            
+
         except Exception as e:
             print(f"❌ Error getting anime details from hanime: {e}")
             return None
@@ -357,28 +357,28 @@ class HanimeScraper:
         if not anime_details or 'url' not in anime_details:
             print("❌ Invalid anime details. Cannot get episodes.")
             return []
-            
+
         print(f"🎬 Getting episodes for {anime_details.get('title', 'anime')} from hanime...")
-        
+
         try:
             slug = anime_details['url'].split('/')[-1]
             api_url = f"{self.BASE_URL}/api/v8/video?id={slug}"
-            
+
             response = self.session.get(api_url, headers=self.headers, timeout=15)
             response.raise_for_status()
-            
+
             response_data = response.json()
             episodes = []
-            
+
             # Extract franchise videos if any
             franchise_videos = response_data.get('hentai_franchise_hentai_videos', [])
-            
+
             if franchise_videos:
                 for idx, video in enumerate(reversed(franchise_videos)):
                     episode_number = idx + 1
                     timestamp = (video.get('releasedAtUnix', 0) or 0) * 1000
                     video_id = video.get('id')
-                    
+
                     episodes.append({
                         'title': f"Episode {episode_number}",
                         'episode': episode_number,
@@ -395,9 +395,9 @@ class HanimeScraper:
                     'date': 0,
                     'source': 'hanime'
                 })
-                
+
             return episodes
-            
+
         except Exception as e:
             print(f"❌ Error getting episodes from hanime: {e}")
             return []
@@ -405,42 +405,42 @@ class HanimeScraper:
     def get_video_sources(self, episode_url):
         """Get video streams, similar to Kotlin's videoListParse."""
         print(f"🎥 Getting video streams from hanime: {episode_url}")
-        
+
         try:
             # Check for auth cookie
             self._set_auth_cookie()
-            
+
             if self.auth_cookie:
                 video_list = self._fetch_premium_videos(episode_url)
             else:
                 # Regular video fetching
                 response = self.session.get(episode_url, headers=self.headers, timeout=15)
                 response.raise_for_status()
-                
+
                 response_data = response.json()
-                
+
                 # Extract videos from manifest
                 videos_manifest = response_data.get('videos_manifest', {})
                 servers = videos_manifest.get('servers', [])
-                
+
                 if not servers or len(servers) == 0:
                     print("❌ No servers found in the manifest.")
                     return []
-                    
+
                 # Get streams from first server
                 streams = servers[0].get('streams', [])
-                
+
                 # Filter out premium alert streams
                 streams = [s for s in streams if s.get('kind') != 'premium_alert']
-                
+
                 video_list = []
                 for stream in streams:
                     url = stream.get('url', '')
                     height = stream.get('height', '')
                     quality = f"{height}p"
-                    
+
                     video_list.append(Video(url, quality, url))
-            
+
             # Create sources format for the CLI
             video_sources = []
             for video in video_list:
@@ -448,7 +448,7 @@ class HanimeScraper:
                     'url': video.videoUrl,
                     'quality': video.videoTitle
                 })
-                
+
             # Log and save to urls.txt
             with open('urls.txt', 'a', encoding='utf-8') as f:
                 f.write(f"\n==== Hanime: {len(video_sources)} quality options ====\n")
@@ -456,9 +456,9 @@ class HanimeScraper:
                     source_line = f"{source['quality']}: {source['url']}\n"
                     f.write(source_line)
                 f.write("\n")
-            
+
             return video_sources
-            
+
         except Exception as e:
             print(f"❌ Error getting video streams from hanime: {e}")
             return []
@@ -468,30 +468,30 @@ class HanimeScraper:
         try:
             custom_headers = self.headers.copy()
             custom_headers['cookie'] = self.auth_cookie
-            
+
             # Extract video ID
             video_id = episode_url.split('id=')[-1]
             video_url = f"{self.BASE_URL}/videos/hentai/{video_id}"
-            
+
             response = self.session.get(video_url, headers=custom_headers, timeout=15)
             response.raise_for_status()
-            
+
             # Extract data from the script tag containing __NUXT__
             nuxt_pattern = r'__NUXT__=(.*?);\s*</script>'
             nuxt_match = re.search(nuxt_pattern, response.text)
-            
+
             if not nuxt_match:
                 print("❌ Could not find __NUXT__ data.")
                 return []
-                
+
             nuxt_data = json.loads(nuxt_match.group(1))
-            
+
             # Navigate to video data
             state_data = nuxt_data.get('state', {}).get('data', {})
             video_data = state_data.get('video', {})
             manifest = video_data.get('videos_manifest', {})
             servers = manifest.get('servers', [])
-            
+
             videos = []
             for server in servers:
                 streams = server.get('streams', [])
@@ -499,11 +499,11 @@ class HanimeScraper:
                     url = stream.get('url', '')
                     height = stream.get('height', '')
                     quality = f"{height}p"
-                    
+
                     videos.append(Video(url, quality, url))
-                    
+
             return self._sort_videos(videos)
-            
+
         except Exception as e:
             print(f"❌ Error fetching premium videos: {e}")
             return []
@@ -517,9 +517,9 @@ class HanimeScraper:
             match = re.search(r'(\d+)p', video.videoTitle)
             if match:
                 resolution = int(match.group(1))
-                
+
             return -resolution  # negative for descending order
-            
+
         # Return all videos sorted by resolution
         return sorted(videos, key=sort_key)
 
@@ -621,22 +621,22 @@ class HanimeScraper:
         else:
             print(f"Invalid quality. Available options: {', '.join(self.QUALITY_LIST)}")
             return False
-            
+
     def get_popular_anime(self, page=1):
         """Get popular anime (sorted by likes) - returns all results without pagination."""
         print(f"💫 Getting popular anime from hanime...")
-        
+
         all_results = []
         max_pages = 5  # Fetching up to 5 pages to get more results
-        
+
         try:
             # Use the default filters (likes, desc sorting)
             self.active_filters["order_by"] = "likes"
             self.active_filters["ordering"] = "desc"
-            
+
             for current_page in range(1, max_pages + 1):
                 search_body = self.search_request_body("", current_page, None)
-                
+
                 response = self.session.post(
                     self.SEARCH_URL,
                     headers=self.search_headers,
@@ -644,33 +644,37 @@ class HanimeScraper:
                     timeout=15
                 )
                 response.raise_for_status()
-                
+
+                # Debug the response data
+                response_data = response.json()
+                print(f"API Response hits sample: {response_data.get('hits', '')[:100]}...")
+
                 # Parse search results into anime list
-                page_results = self._parse_search_json(response.json())
-                
+                page_results = self._parse_search_json(response_data)
+
                 if not page_results:
                     break
-                    
+
                 all_results.extend(page_results)
                 print(f"Fetched page {current_page}, total results so far: {len(all_results)}")
-                
+
                 # Add a small delay to avoid rate limiting
                 time.sleep(0.5)
-            
+
             print(f"Found {len(all_results)} popular anime from hanime")
             return all_results
-            
+
         except Exception as e:
             print(f"❌ Error getting popular anime from hanime: {e}")
             return all_results if all_results else []
-    
+
     def get_latest_anime(self, page=1):
         """Get latest anime (sorted by published date) - returns all results without pagination."""
         print(f"🆕 Getting latest anime from hanime...")
-        
+
         all_results = []
         max_pages = 5  # Fetching up to 5 pages to get more results
-        
+
         try:
             # Create filters for latest anime (created_at_unix, desc)
             latest_filters = {
@@ -681,10 +685,10 @@ class HanimeScraper:
                 "order_by": "created_at_unix",
                 "ordering": "desc"
             }
-            
+
             for current_page in range(1, max_pages + 1):
                 search_body = self.search_request_body("", current_page, latest_filters)
-                
+
                 response = self.session.post(
                     self.SEARCH_URL,
                     headers=self.search_headers,
@@ -692,22 +696,26 @@ class HanimeScraper:
                     timeout=15
                 )
                 response.raise_for_status()
-                
+
+                # Debug the response data
+                response_data = response.json()
+                print(f"API Response hits sample: {response_data.get('hits', '')[:100]}...")
+
                 # Parse search results into anime list
-                page_results = self._parse_search_json(response.json())
-                
+                page_results = self._parse_search_json(response_data)
+
                 if not page_results:
                     break
-                    
+
                 all_results.extend(page_results)
                 print(f"Fetched page {current_page}, total results so far: {len(all_results)}")
-                
+
                 # Add a small delay to avoid rate limiting
                 time.sleep(0.5)
-            
+
             print(f"Found {len(all_results)} latest anime from hanime")
             return all_results
-            
+
         except Exception as e:
             print(f"❌ Error getting latest anime from hanime: {e}")
             return all_results if all_results else []
