@@ -284,7 +284,7 @@ class HanimeScraper:
 
         for item in grouped_items.values():
             title = self._get_title(item.get('name', ''))
-            thumbnail_url = item.get('coverUrl')
+            thumbnail_url = item.get('posterUrl')
             author = item.get('brand')
             description = item.get('description', '')
             if description:
