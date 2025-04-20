@@ -300,6 +300,11 @@ async def get_details(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting details: {str(e)}")
+"""
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
+"""
 
 @app.get("/api/manga/get-pages")
 async def get_manga_pages(
@@ -394,27 +399,11 @@ async def get_manga_pages(
 
 @app.get("/api/anime/search", response_model=MangaResponse)
 async def search_anime(
-    source: str = Query(..., description="Source to search in (hanime, hahomoe)"),
     q: str = Query(..., description="Search query"),
+    source: str = Query(..., description="Source to search (hanime)"),
     page: Optional[int] = Query(1, description="Page number", ge=1),
-    limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100),
-    included_tags: Optional[List[str]] = Query(None, description="Tags to include"),
-    excluded_tags: Optional[List[str]] = Query(None, description="Tags to exclude"),
-    brands: Optional[List[str]] = Query(None, description="Brands to filter by"),
-    sort: Optional[str] = Query(None, description="Sort option (for HahoMoe)")
+    limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
-    """
-    Search for anime by title and optional filters
-
-    - **source**: Source name (hanime, hahomoe)
-    - **q**: Search query
-    - **page**: Page number
-    - **limit**: Results per page
-    - **included_tags**: Tags to include in results
-    - **excluded_tags**: Tags to exclude from results
-    - **brands**: Brands to filter by
-    - **sort**: Sort option (for HahoMoe)
-    """
     start_time = time.time()
 
     # Validate source
@@ -425,28 +414,8 @@ async def search_anime(
     scraper = anime_scrapers[source]
 
     try:
-        # Prepare filters based on source
-        filters = {}
-
-        if source == "hanime":
-            if included_tags:
-                filters["included_tags"] = included_tags
-            if excluded_tags:
-                filters["blacklisted_tags"] = excluded_tags
-            if brands:
-                filters["brands"] = brands
-
-        elif source == "hahomoe":
-            if included_tags:
-                filters["included_genres"] = included_tags
-            if excluded_tags:
-                filters["excluded_genres"] = excluded_tags
-            if sort:
-                filters["sort"] = sort
-            filters["page"] = page
-
         # Search anime
-        results = scraper.search_anime(q, filters)
+        results = scraper.search_anime(q)
 
         # Add source to each result
         for result in results:
@@ -476,7 +445,7 @@ async def search_anime(
 
 @app.get("/api/anime/popular", response_model=MangaResponse)
 async def get_popular_anime(
-    source: str = Query(..., description="Source to fetch from (hanime, hahomoe)"),
+    source: str = Query(..., description="Source to fetch from (hanime)"),
     page: Optional[int] = Query(1, description="Page number", ge=1),
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
@@ -520,7 +489,7 @@ async def get_popular_anime(
 
 @app.get("/api/anime/latest", response_model=MangaResponse)
 async def get_latest_anime(
-    source: str = Query(..., description="Source to fetch from (hanime, hahomoe)"),
+    source: str = Query(..., description="Source to fetch from (hanime)"),
     page: Optional[int] = Query(1, description="Page number", ge=1),
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
@@ -564,14 +533,14 @@ async def get_latest_anime(
 
 @app.get("/api/anime/details")
 async def get_anime_details(
-    source: str = Query(..., description="Source to fetch from (hanime, hahomoe)"),
-    id: str = Query(..., description="ID or URL of the anime")
+    source: str = Query(..., description="Source to fetch from (hanime)"),
+    id: str = Query(..., description="URL/ID of the anime")
 ):
     """
-    Get detailed information about an anime including all episodes
+    Get detailed information about an anime by ID from specified source
 
-    - **source**: Source name (hanime, hahomoe)
-    - **id**: ID or URL of the anime
+    - **source**: Source name (hanime)
+    - **id**: URL/ID of the anime
     """
     start_time = time.time()
 
@@ -583,16 +552,16 @@ async def get_anime_details(
     scraper = anime_scrapers[source]
 
     try:
-        # Get anime details (adjust ID format as needed)
+        # Get anime details
         details = scraper.get_anime_details(id)
 
         if not details:
             raise HTTPException(status_code=404, detail=f"Anime not found: {id}")
 
-        # Get episodes
+        # Get episodes for this anime
         episodes = scraper.get_episodes(details)
 
-        # Add episodes to the response
+        # Add episodes to details
         details["episodes"] = episodes
 
         # Calculate execution time
@@ -608,17 +577,19 @@ async def get_anime_details(
 
 @app.get("/api/anime/get-episode")
 async def get_anime_episode(
-    source: str = Query(..., description="Source to fetch from (hanime, hahomoe)"),
-    id: str = Query(..., description="ID or URL of the episode")
+    source: str = Query(..., description="Source to fetch from (hanime)"),
+    id: str = Query(..., description="URL/ID of the anime"),
+    #episode_url: Optional[str] = Query(None, description="URL of the specific episode (optional)")
 ):
     """
-    Get streaming links for a specific episode ID/URL
+    Get episodes or specific episode streaming links from an anime
 
-    - **source**: Source name (hanime, hahomoe)
-    - **id**: ID or URL of the episode to get streaming links for
+    - **source**: Source name (hanime)
+    - **id**: URL/ID of the anime
+    - **episode_url**: Optional URL of the specific episode to get streaming links
     """
     start_time = time.time()
-
+    episode_url=id
     # Validate source
     if source not in anime_scrapers:
         raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
@@ -627,58 +598,52 @@ async def get_anime_episode(
     scraper = anime_scrapers[source]
 
     try:
-        # ID is the episode URL
-        episode_url = id
+        # If episode_url is provided, get streaming links for that specific episode
+        #if episode_url:
+            # Get video sources directly from the episode URL
         video_sources = scraper.get_video_sources(episode_url)
 
-        # Calculate execution time
+            # Calculate execution time
         execution_time_ms = int((time.time() - start_time) * 1000)
 
-        # Prepare response
+            # Prepare response
         response = {
-            "source": source,
-            "id": id,
-            "episode_url": episode_url,
-            "streams": video_sources,
-            "executionTimeMs": execution_time_ms
-        }
+                "source": source,
+                "id": id,
+                "episode_url": episode_url,
+                "streams": video_sources,
+                "executionTimeMs": execution_time_ms
+            }
 
         return response
+        """
+        else:
+            # First get anime details
+            details = scraper.get_anime_details(id)
+
+            if not details:
+                raise HTTPException(status_code=404, detail=f"Anime not found: {id}")
+
+            # Get episodes
+            episodes = scraper.get_episodes(details)
+
+            # Calculate execution time
+            execution_time_ms = int((time.time() - start_time) * 1000)
+
+            # Prepare response
+            response = {
+                "source": source,
+                "id": id,
+                "title": details.get("title", ""),
+                "episodes": episodes,
+                "executionTimeMs": execution_time_ms
+            }
+
+            return response
+        """
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting anime episode data: {str(e)}")
-
-@app.get("/api/anime/get-filters")
-async def get_anime_filters(
-    source: str = Query(..., description="Source to fetch filters from (hanime, hahomoe)")
-):
-    """
-    Get available filters for a specific anime source
-
-    - **source**: Source name (hanime, hahomoe)
-    """
-    # Validate source
-    if source not in anime_scrapers:
-        raise HTTPException(status_code=400, detail=f"Invalid source. Available sources: {', '.join(anime_scrapers.keys())}")
-
-    # Get the appropriate scraper
-    scraper = anime_scrapers[source]
-
-    try:
-        if source == "hanime":
-            return {
-                "tags": scraper.available_tags,
-                "brands": scraper.available_brands,
-                "sort_options": scraper.get_sortable_list()
-            }
-        elif source == "hahomoe":
-            return scraper.get_filters()
-        else:
-            return {"error": "Source does not support filters"}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error getting filters: {str(e)}")
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)

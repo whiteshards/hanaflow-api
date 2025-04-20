@@ -326,44 +326,6 @@ class HahoMoeSearcher:
             available_qualities = {
                 "1080p": None,
                 "720p": None,
-                "480p": None,
-                "360p": None
-            }
-
-            # First pass to collect all available qualities
-            for source in sources:
-                src = source.get('src')
-                title = source.get('title', 'Unknown')
-
-                if src and title in available_qualities:
-                    available_qualities[title] = src
-
-            # Open urls.txt file to append the stream URLs
-            with open('urls.txt', 'a') as url_file:
-                url_file.write(f"\n==== HahoMoe: {episode_info} ====\n")
-
-                # Add all available qualities to the video sources
-                for quality, url in available_qualities.items():
-                    if url:
-                        video_sources.append({
-                            'url': url,
-                            'quality': quality,
-                            'source': 'hahomoe'
-                        })
-
-                # Sort video sources by quality (highest first)
-                video_sources.sort(key=lambda x: {
-                    "1080p": 4,
-                    "720p": 3, 
-                    "480p": 2, 
-                    "360p": 1
-                }.get(x['quality'], 0), reverse=True)
-
-            return video_sources
-
-        except Exception as e:
-            print(f"❌ Failed to get video sources from HahoMoe: {e}")
-            return []
 
     def get_popular_anime(self, page=1):
         """Get popular anime from HahoMoe"""
