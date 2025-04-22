@@ -424,6 +424,8 @@ async def search_anime(
         # Add source to each result
         for result in results:
             result["source"] = source
+            result["id"] = result["url"].split("<&sep>")[0]
+            #result["id"] = result["id"].replace(f"\u0003E", ">")
 
         # Paginate results
         paginated_results = paginate_results(results, page, limit)

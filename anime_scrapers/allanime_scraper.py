@@ -1136,7 +1136,7 @@ class AllAnimeScraper:
         """Get detailed information about an anime (like Kotlin's animeDetailsParse)."""
         print(f"📝 Getting details for {url} from AllAnime...")
         try:
-            anime_id = url.split("<&sep>")[0]
+            anime_id = url
 
             variables = {"_id": anime_id}
             data = {"variables": variables, "query": self.DETAILS_QUERY}
