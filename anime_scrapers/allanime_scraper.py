@@ -755,10 +755,14 @@ class AllAnimeScraper:
             # Construct URL format similar to Kotlin for details/episode fetching
             # url = _id<&sep>slugTime<&sep>slug
             url = f"{item.get('_id')}<&sep>{item.get('slugTime', '')}<&sep>{self._slugify(item.get('name', ''))}"
+            
+            # Store the ID in the format that details endpoint expects
+            anime_id = url  # This is the ID that will be used by get_anime_details
 
             anime_list.append({
                 'title': f"{title} [AllAnime]",
                 'url': url,
+                'id': anime_id,  # Add the ID explicitly to ensure it's available for details
                 'poster': thumbnail_url,
                 'source': 'allanime',
                 # Add other potential fields if needed later from 'item'
@@ -953,10 +957,12 @@ class AllAnimeScraper:
                     
                 thumbnail_url = card.get('thumbnail')
                 url = f"{card.get('_id')}<&sep>{card.get('slugTime', '')}<&sep>{self._slugify(card.get('name', ''))}"
+                anime_id = url  # This is the ID that will be used by get_anime_details
                 
                 results.append({
                     'title': f"{title} [AllAnime]",
                     'url': url,
+                    'id': anime_id,  # Add the ID explicitly to ensure it's available for details
                     'poster': thumbnail_url,
                     'source': 'allanime',
                     'type': card.get('type')
