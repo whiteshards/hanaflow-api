@@ -474,6 +474,7 @@ async def get_popular_anime(
         # Add source to each result
         for result in results:
             result["source"] = source
+            result["id"] = result["url"].split("<&sep>")[0]
 
         # Paginate results
         paginated_results = paginate_results(results, page, limit)
@@ -521,6 +522,7 @@ async def get_latest_anime(
         # Add source to each result
         for result in results:
             result["source"] = source
+            result["id"] = result["url"].split("<&sep>")[0]
 
         # Paginate results
         paginated_results = paginate_results(results, page, limit)

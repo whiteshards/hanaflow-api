@@ -1,3 +1,4 @@
+from click import pass_obj
 import requests
 import json
 import re
@@ -1500,25 +1501,31 @@ class AllAnimeScraper:
                         f.write(f"\n[Thread] Extracting videos from: {s_name} ({s_url})\n")
 
                     if s_name.startswith("internal "):
-                        local_videos = self.all_anime_extractor.videoFromUrl(s_url, s_raw_name)
+                        pass
+                        #local_videos = self.all_anime_extractor.videoFromUrl(s_url, s_raw_name)
                     elif s_name.startswith("player@"):
                         print(f"Player type extraction not implemented for: {s_url}")
                         with open('error.txt', 'a', encoding='utf-8') as f:
                             f.write(f"Player type extraction not implemented\n")
                     elif s_name == "vidstreaming":
-                        local_videos = self.gogo_stream_extractor.videosFromUrl(s_url.replace("//", "https://"))
+                        pass
+                        #local_videos = self.gogo_stream_extractor.videosFromUrl(s_url.replace("//", "https://"))
                     elif s_name == "doodstream":
-                        local_videos = self.dood_extractor.videosFromUrl(s_url)
+                        pass
+                        #local_videos = self.dood_extractor.videosFromUrl(s_url)
                     elif s_name == "okru":
                         local_videos = self.okru_extractor.videosFromUrl(s_url)
                     elif s_name == "mp4upload":
                         local_videos = self.mp4upload_extractor.videosFromUrl(s_url, self.headers)
                     elif s_name == "streamlare":
-                        local_videos = self.streamlare_extractor.videosFromUrl(s_url)
+                        pass
+                        #local_videos = self.streamlare_extractor.videosFromUrl(s_url)
                     elif s_name == "filemoon":
-                        local_videos = self.filemoon_extractor.videosFromUrl(s_url, prefix="Filemoon:")
+                        pass
+                        #local_videos = self.filemoon_extractor.videosFromUrl(s_url, prefix="Filemoon:")
                     elif s_name == "streamwish":
-                        local_videos = self.streamwish_extractor.videosFromUrl(s_url, videoNameGen=lambda q: f"StreamWish:{q}")
+                        pass
+                        #local_videos = self.streamwish_extractor.videosFromUrl(s_url, videoNameGen=lambda q: f"StreamWish:{q}")
 
                     with open('error.txt', 'a', encoding='utf-8') as f:
                         f.write(f"[Thread] Extracted {len(local_videos)} videos from {s_name}\n")
