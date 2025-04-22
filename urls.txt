@@ -4,6 +4,3 @@
 480p: https://m3u8s.highwinds-cdn.com/api/v9/m3u8s/jfzk8r07Adgg14A0hgklj2bjm1Zzmx2klmvcpm56fAzpp0cdhfm5q.m3u8
 360p: https://m3u8s.highwinds-cdn.com/api/v9/m3u8s/stgA7yjsn62l7ng85007xtcvcAZ4120trh0n70qxAAkycvt86jjf7.m3u8
 
-
-==== HahoMoe: 2 ====
-360p: https://s1.filegasm.com/07066ec5bf0ec56b?download_token=6150e8519d865f5578c75bcc0d2f5650c317f9e15a02099df00046b05886aced
