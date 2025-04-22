@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any, List, Optional
 from anime_scrapers.hanime_scraper import HanimeScraper
 from anime_scrapers.hahomoe_scraper import HahoMoeSearcher
+from anime_scrapers.allanime_scraper import AllAnimeScraper
 from manga_scrapers.comick import ComickScraper
 from manga_scrapers.nhentai import NHentaiScraper
 import time
