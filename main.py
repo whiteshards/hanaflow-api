@@ -121,12 +121,12 @@ async def search_manga(
 
 @app.get("/api/filters")
 async def get_filters(
-    source: str = Query(..., description="Source to get filters for (comick, nhentai, hanime, hahomoe)")
+    source: str = Query(..., description="Source to get filters for (comick, nhentai, hanime, hahomoe, allanime)")
 ):
     """
     Get available filters for a specific source
 
-    - **source**: The source to get filters for (comick, nhentai, hanime, hahomoe)
+    - **source**: The source to get filters for (comick, nhentai, hanime, hahomoe, allanime)
     """
     start_time = time.time()
 
@@ -404,7 +404,7 @@ async def get_manga_pages(
 @app.get("/api/anime/search", response_model=MangaResponse)
 async def search_anime(
     q: str = Query(..., description="Search query"),
-    source: str = Query(..., description="Source to search (hanime, hahomoe)"),
+    source: str = Query(..., description="Source to search (hanime, hahomoe, allanime)"),
     page: Optional[int] = Query(1, description="Page number", ge=1),
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
@@ -449,7 +449,7 @@ async def search_anime(
 
 @app.get("/api/anime/popular", response_model=MangaResponse)
 async def get_popular_anime(
-    source: str = Query(..., description="Source to fetch from (hanime,hahomoe)"),
+    source: str = Query(..., description="Source to fetch from (hanime,hahomoe, allanime)"),
     page: Optional[int] = Query(1, description="Page number", ge=1),
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
@@ -496,7 +496,7 @@ async def get_popular_anime(
 
 @app.get("/api/anime/latest", response_model=MangaResponse)
 async def get_latest_anime(
-    source: str = Query(..., description="Source to fetch from (hanime,hahomoe)"),
+    source: str = Query(..., description="Source to fetch from (hanime,hahomoe, allanime)"),
     page: Optional[int] = Query(1, description="Page number", ge=1),
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
@@ -543,13 +543,13 @@ async def get_latest_anime(
 
 @app.get("/api/anime/details")
 async def get_anime_details(
-    source: str = Query(..., description="Source to fetch from (hanime, hahomoe)"),
+    source: str = Query(..., description="Source to fetch from (hanime, hahomoe, allanime)"),
     id: str = Query(..., description="URL/ID of the anime")
 ):
     """
     Get detailed information about an anime including episodes
 
-    - **source**: Source name (hanime, hahomoe)
+    - **source**: Source name (hanime, hahomoe, allanime)
     - **id**: URL/ID of the anime
     """
     start_time = time.time()
@@ -587,13 +587,13 @@ async def get_anime_details(
 
 @app.get("/api/anime/get-episode")
 async def get_anime_episode(
-    source: str = Query(..., description="Source to fetch from (hanime, hahomoe)"),
+    source: str = Query(..., description="Source to fetch from (hanime, hahomoe, allanime)"),
     id: str = Query(..., description="URL/ID of the anime episode")
 ):
     """
     Get streaming links for a specific anime episode
 
-    - **source**: Source name (hanime, hahomoe)
+    - **source**: Source name (hanime, hahomoe, allanime)
     - **id**: URL/ID of the anime episode
     """
     start_time = time.time()
