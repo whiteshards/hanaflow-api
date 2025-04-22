@@ -60,6 +60,148 @@ class AllAnimeExtractor(BaseExtractor):
         try:
             # Get the endpoint from getVersion
             endpoint_response = self.session.get(f"{self.site_url}/getVersion")
+
+    # --- Filter handling methods ---
+    def get_filters(self):
+        """Get available filters for search"""
+        # Based on AllAnimeFilters.kt
+        return {
+            "origins": [
+                {"id": "ALL", "name": "All"},
+                {"id": "JP", "name": "Japan"},
+                {"id": "CN", "name": "China"},
+                {"id": "KR", "name": "Korea"}
+            ],
+            "seasons": [
+                {"id": "all", "name": "All"},
+                {"id": "Winter", "name": "Winter"},
+                {"id": "Spring", "name": "Spring"},
+                {"id": "Summer", "name": "Summer"},
+                {"id": "Fall", "name": "Fall"}
+            ],
+            "years": [{"id": "all", "name": "All"}] + [
+                {"id": str(year), "name": str(year)} for year in range(2024, 1974, -1)
+            ],
+            "sortBy": [
+                {"id": "update", "name": "Update"},
+                {"id": "Name_ASC", "name": "Name Asc"},
+                {"id": "Name_DESC", "name": "Name Desc"},
+                {"id": "Top", "name": "Ratings"}
+            ],
+            "types": [
+                {"id": "Movie", "name": "Movie"},
+                {"id": "ONA", "name": "ONA"},
+                {"id": "OVA", "name": "OVA"},
+                {"id": "Special", "name": "Special"},
+                {"id": "TV", "name": "TV"},
+                {"id": "Unknown", "name": "Unknown"}
+            ],
+            "genres": [
+                {"id": "Action", "name": "Action"},
+                {"id": "Adventure", "name": "Adventure"},
+                {"id": "Cars", "name": "Cars"},
+                {"id": "Comedy", "name": "Comedy"},
+                {"id": "Dementia", "name": "Dementia"},
+                {"id": "Demons", "name": "Demons"},
+                {"id": "Drama", "name": "Drama"},
+                {"id": "Ecchi", "name": "Ecchi"},
+                {"id": "Fantasy", "name": "Fantasy"},
+                {"id": "Game", "name": "Game"},
+                {"id": "Harem", "name": "Harem"},
+                {"id": "Historical", "name": "Historical"},
+                {"id": "Horror", "name": "Horror"},
+                {"id": "Isekai", "name": "Isekai"},
+                {"id": "Josei", "name": "Josei"},
+                {"id": "Kids", "name": "Kids"},
+                {"id": "Magic", "name": "Magic"},
+                {"id": "Martial Arts", "name": "Martial Arts"},
+                {"id": "Mecha", "name": "Mecha"},
+                {"id": "Military", "name": "Military"},
+                {"id": "Music", "name": "Music"},
+                {"id": "Mystery", "name": "Mystery"},
+                {"id": "Parody", "name": "Parody"},
+                {"id": "Police", "name": "Police"},
+                {"id": "Psychological", "name": "Psychological"},
+                {"id": "Romance", "name": "Romance"},
+                {"id": "Samurai", "name": "Samurai"},
+                {"id": "School", "name": "School"},
+                {"id": "Sci-Fi", "name": "Sci-Fi"},
+                {"id": "Seinen", "name": "Seinen"},
+                {"id": "Shoujo", "name": "Shoujo"},
+                {"id": "Shoujo Ai", "name": "Shoujo Ai"},
+                {"id": "Shounen", "name": "Shounen"},
+                {"id": "Shounen Ai", "name": "Shounen Ai"},
+                {"id": "Slice of Life", "name": "Slice of Life"},
+                {"id": "Space", "name": "Space"},
+                {"id": "Sports", "name": "Sports"},
+                {"id": "Super Power", "name": "Super Power"},
+                {"id": "Supernatural", "name": "Supernatural"},
+                {"id": "Thriller", "name": "Thriller"},
+                {"id": "Unknown", "name": "Unknown"},
+                {"id": "Vampire", "name": "Vampire"},
+                {"id": "Yaoi", "name": "Yaoi"},
+                {"id": "Yuri", "name": "Yuri"}
+            ]
+        }
+        
+    def apply_filters(self, filters=None):
+        """Apply search filters"""
+        if not filters:
+            return
+            
+        # You can implement filter application logic here
+        # This would modify self.active_filters based on the provided filters
+        pass
+        
+    def get_sortable_list(self):
+        """Get available sort options"""
+        return [
+            ("Update", "update"),
+            ("Name Ascending", "Name_ASC"),
+            ("Name Descending", "Name_DESC"),
+            ("Ratings", "Top")
+        ]
+        
+    def get_tags(self):
+        """Get available tags/genres"""
+        genres = self.get_filters().get("genres", [])
+        return genres
+        
+    def get_types(self):
+        """Get available anime types"""
+        types = self.get_filters().get("types", [])
+        return types
+        
+    def get_seasons(self):
+        """Get available seasons"""
+        seasons = self.get_filters().get("seasons", [])
+        return seasons
+        
+    def get_years(self):
+        """Get available years"""
+        years = self.get_filters().get("years", [])
+        return years
+        
+    def get_origins(self):
+        """Get available country origins"""
+        origins = self.get_filters().get("origins", [])
+        return origins
+        
+    def clear_filters(self):
+        """Reset all filters to default values"""
+        self.preferences = {
+            "preferred_domain": "https://api.allanime.day",
+            "preferred_site_domain": "https://allanime.to",
+            "preferred_sub": "sub",
+            "preferred_title_style": "romaji",
+            "preferred_quality": "1080",
+            "preferred_server": "site_default",
+            "hoster_selection": {"default", "ac", "ak", "kir", "luf-mp4", "si-hls", "s-mp4", "ac-hls"},
+            "alt_hoster_selection": {"player", "vidstreaming", "okru", "mp4upload", "streamlare", "doodstream", "filemoon", "streamwish"}
+        }
+        print("All filters have been reset")
+        return True
+
             if endpoint_response.status_code != 200:
                 print(f"❌ Failed to get version endpoint: {endpoint_response.status_code}")
                 with open("error.txt", "a") as f:
@@ -812,64 +954,88 @@ class AllAnimeScraper:
         print(f"🔍 Searching for '{query}' on AllAnime...")
         results = []
         page = 1
-        # Pagination is handled by the API returning results until empty, not explicit page limit needed here.
-
+        has_more_results = True
+        max_pages = 10  # Safety limit to avoid infinite loops
+        
         try:
-            variables = {
-                "search": {
-                    "allowAdult": False, # Default values
-                    "allowUnknown": False
-                },
-                "limit": self.PAGE_SIZE,
-                "page": page,
-                "translationType": self._get_preference("preferred_sub"),
-                "countryOrigin": "ALL" # Default, filters might override
-            }
-            if query:
-                variables["search"]["query"] = query
-            else:
-                # TODO: Implement filter logic based on AllAnimeFilters.kt.txt
-                # This requires translating getSearchParameters and applying filter values
-                print("⚠️ Filter search is not yet implemented for AllAnime.")
-                # Example structure if filters were passed:
-                # if filters:
-                #     variables["search"]["season"] = filters.get("season", "all") # Example
-                #     variables["countryOrigin"] = filters.get("origin", "ALL") # Example
-                #     # ... add other filters (genres, types, year, sortBy)
-                pass # Proceed with default search if no query and filters not implemented
+            while has_more_results and page <= max_pages:
+                variables = {
+                    "search": {
+                        "allowAdult": False,  # Default values
+                        "allowUnknown": False
+                    },
+                    "limit": self.PAGE_SIZE,
+                    "page": page,
+                    "translationType": self._get_preference("preferred_sub"),
+                    "countryOrigin": "ALL"  # Default, filters might override
+                }
+                
+                if query:
+                    variables["search"]["query"] = query
+                elif filters:
+                    # Apply filters if provided
+                    if filters.get("season") and filters.get("season") != "all":
+                        variables["search"]["season"] = filters.get("season")
+                    
+                    if filters.get("releaseYear") and filters.get("releaseYear") != "all":
+                        variables["search"]["year"] = int(filters.get("releaseYear"))
+                    
+                    if filters.get("genres") and filters.get("genres") != "all":
+                        try:
+                            variables["search"]["genres"] = json.loads(filters.get("genres"))
+                            variables["search"]["excludeGenres"] = []
+                        except json.JSONDecodeError:
+                            print("⚠️ Invalid genres format in filters")
+                    
+                    if filters.get("types") and filters.get("types") != "all":
+                        try:
+                            variables["search"]["types"] = json.loads(filters.get("types"))
+                        except json.JSONDecodeError:
+                            print("⚠️ Invalid types format in filters")
+                    
+                    if filters.get("sortBy") and filters.get("sortBy") != "update":
+                        variables["search"]["sortBy"] = filters.get("sortBy")
+                    
+                    if filters.get("origin") and filters.get("origin") != "ALL":
+                        variables["countryOrigin"] = filters.get("origin")
 
-            data = {
-                "variables": variables,
-                "query": self.SEARCH_QUERY
-            }
+                data = {
+                    "variables": variables,
+                    "query": self.SEARCH_QUERY
+                }
 
-            request = self._build_post_request(data)
-            response = self.session.send(request, timeout=20) # Add timeout
+                request = self._build_post_request(data)
+                response = self.session.send(request, timeout=30)  # Increased timeout
 
-            if response.status_code == 400:
-                 print(f"❌ AllAnime search failed (400 Bad Request). Payload: {json.dumps(data)}")
-                 with open("error.txt", "w") as n: n.write("Payload: " + str(data)); n.write("\nRespone Text:" + str(response.text))
-                 print(f"Response Text: {response.text[:500]}")
-                 #n.write(str(response.text)) # Print beginning of error response
-                 return []
-            response.raise_for_status() # Raise an exception for other bad status codes
-
-            response_data = response.json()
-            page_results = self._parse_anime(response_data)
-            results.extend(page_results)
-
-            # Note: AllAnime API doesn't seem to have explicit pagination info in search response.
-            # The Kotlin code checks if results == PAGE_SIZE. We'll assume one page for CLI simplicity for now.
-            # If pagination is needed, the API structure might require a different approach.
+                if response.status_code == 400:
+                    print(f"❌ AllAnime search failed (400 Bad Request). Payload: {json.dumps(data)}")
+                    with open("error.txt", "a") as n:
+                        n.write(f"\nPayload: {data}\n")
+                        n.write(f"Response Text: {response.text}\n")
+                    print(f"Response Text: {response.text[:500]}")
+                    break
+                    
+                response.raise_for_status()
+                
+                response_data = response.json()
+                page_results = self._parse_anime(response_data)
+                results.extend(page_results)
+                
+                # Check if we should fetch more pages
+                if len(page_results) < self.PAGE_SIZE:
+                    has_more_results = False  # We got fewer results than requested, no more pages
+                else:
+                    page += 1
+                    print(f"Fetching page {page} of results...")
 
         except requests.exceptions.Timeout:
             print("❌ AllAnime search request timed out.")
         except requests.exceptions.RequestException as e:
             print(f"❌ AllAnime search failed: {e}")
-            with open("error.txt", "w") as ne:
-                ne.write(str(e))
+            with open("error.txt", "a") as ne:
+                ne.write(f"\nSearch error: {e}\n")
             # Print response body if available for debugging
-            if e.response is not None:
+            if hasattr(e, 'response') and e.response is not None:
                 print(f"Response status: {e.response.status_code}")
                 try:
                     print(f"Response body: {e.response.text[:500]}")
@@ -882,6 +1048,7 @@ class AllAnimeScraper:
             print(f"An unexpected error occurred during AllAnime search: {e}")
             print(traceback.format_exc())
 
+        print(f"✅ Found {len(results)} total results for '{query}'")
         return results
 
     def get_anime_details(self, url: str) -> Optional[Dict[str, Any]]:
@@ -1304,16 +1471,14 @@ class AllAnimeScraper:
             with open('error.txt', 'a', encoding='utf-8') as f:
                 f.write(f"\nExtracted {len(extracted_video_list)} total videos\n")
 
-            # --- Sort Videos (like Kotlin's prioritySort) ---
+            # --- Include all videos without filtering by quality preference ---
+            with open('error.txt', 'a', encoding='utf-8') as f:
+                f.write(f"\nIncluding all {len(extracted_video_list)} video options\n")
+
+            # Sort videos but return all of them instead of filtering
             pref_server = self._get_preference("preferred_server")
             quality_pref = self._get_preference("preferred_quality")
             sub_pref = self._get_preference("preferred_sub") # sub or dub
-
-            with open('error.txt', 'a', encoding='utf-8') as f:
-                f.write(f"\nSorting videos with preferences:\n")
-                f.write(f"  Preferred server: {pref_server}\n")
-                f.write(f"  Preferred quality: {quality_pref}\n")
-                f.write(f"  Preferred sub/dub: {sub_pref}\n")
 
             def sort_key(video_tuple: Tuple[Dict[str, Any], float]):
                 video_dict, server_priority = video_tuple
@@ -1343,8 +1508,16 @@ class AllAnimeScraper:
                 # Return tuple for sorting (higher scores first)
                 return (server_score, quality_score, sub_dub_score)
 
+            # Sort videos but keep all of them
             sorted_video_tuples = sorted(extracted_video_list, key=sort_key, reverse=True)
-            video_sources = [v[0] for v in sorted_video_tuples] # Extract only the video dicts
+            video_sources = [v[0] for v in sorted_video_tuples] # Extract all video dicts
+            
+            with open('error.txt', 'a', encoding='utf-8') as f:
+                f.write(f"Returning all {len(video_sources)} video options\n")
+                for i, video in enumerate(video_sources[:10], 1):  # Log first 10 for debugging
+                    f.write(f"  {i}. {video.get('quality', 'Unknown')} - {video.get('url', 'No URL')[:100]}...\n")
+                if len(video_sources) > 10:
+                    f.write(f"  ... and {len(video_sources) - 10} more\n")
 
             # --- Save to urls.txt ---
             if video_sources:

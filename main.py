@@ -8,6 +8,8 @@ from manga_scrapers.nhentai import NHentaiScraper
 import time
 import math
 from pydantic import BaseModel
+from anime_scrapers.allanime_scraper import AllAnimeScraper #Import AllAnimeScraper
+
 
 app = FastAPI(
 
@@ -29,6 +31,7 @@ app.add_middleware(
 comick_scraper = ComickScraper()
 nhentai_scraper = NHentaiScraper()
 hanime_scraper = HanimeScraper()
+all_anime_scraper = AllAnimeScraper() #Initialize AllAnime scraper
 
 # Dictionary to store scrapers by name
 scrapers = {
@@ -40,7 +43,8 @@ scrapers = {
 # Dictionary to store anime scrapers by name
 anime_scrapers = {
     "hanime": hanime_scraper,
-    "hahomoe": HahoMoeSearcher()
+    "hahomoe": HahoMoeSearcher(),
+    "allanime": all_anime_scraper #Add AllAnime scraper
 }
 
 class MangaResponse(BaseModel):
@@ -118,12 +122,12 @@ async def search_manga(
 
 @app.get("/api/filters")
 async def get_filters(
-    source: str = Query(..., description="Source to get filters for (comick, nhentai, hanime, hahomoe)")
+    source: str = Query(..., description="Source to get filters for (comick, nhentai, hanime, hahomoe, allanime)") #added allanime
 ):
     """
     Get available filters for a specific source
 
-    - **source**: The source to get filters for (comick, nhentai, hanime, hahomoe)
+    - **source**: The source to get filters for (comick, nhentai, hanime, hahomoe, allanime) #added allanime
     """
     start_time = time.time()
 
@@ -157,6 +161,17 @@ async def get_filters(
                 "tags": [{"id": tag["id"], "name": tag["name"]} for tag in hahomoe_scraper.get_tags()],
                 "sorts": [{"title": sort[0], "value": sort[1]} for sort in hahomoe_scraper.get_sortable_list()],
                 "quality": hahomoe_scraper.quality_list
+            }
+        elif source == "allanime":
+            all_anime_scraper = AllAnimeScraper()
+            filters = {
+                "origins": all_anime_scraper.get_origins(),
+                "seasons": all_anime_scraper.get_seasons(),
+                "years": all_anime_scraper.get_years(),
+                "types": all_anime_scraper.get_types(),
+                "genres": all_anime_scraper.get_tags(),
+                "sorts": [{"title": sort[0], "value": sort[1]} for sort in all_anime_scraper.get_sortable_list()],
+                "quality": all_anime_scraper.preferences.get("preferred_quality", "1080p")
             }
         else:
             raise HTTPException(status_code=400, detail=f"Filters not available for source: {source}")
@@ -398,7 +413,7 @@ async def get_manga_pages(
 @app.get("/api/anime/search", response_model=MangaResponse)
 async def search_anime(
     q: str = Query(..., description="Search query"),
-    source: str = Query(..., description="Source to search (hanime, hahomoe)"),
+    source: str = Query(..., description="Source to search (hanime, hahomoe, allanime)"), #added allanime
     page: Optional[int] = Query(1, description="Page number", ge=1),
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
@@ -413,7 +428,7 @@ async def search_anime(
 
     try:
         # Search anime
-        results = scraper.search_anime(q)
+        results = scraper.search_anime(q) #no page limit
 
         # Add source to each result
         for result in results:
@@ -443,7 +458,7 @@ async def search_anime(
 
 @app.get("/api/anime/popular", response_model=MangaResponse)
 async def get_popular_anime(
-    source: str = Query(..., description="Source to fetch from (hanime,hahomoe)"),
+    source: str = Query(..., description="Source to fetch from (hanime,hahomoe, allanime)"), #added allanime
     page: Optional[int] = Query(1, description="Page number", ge=1),
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
@@ -460,6 +475,8 @@ async def get_popular_anime(
         # Get popular anime
         if source == "hahomoe":
             results = scraper.get_popular_anime(page)
+        elif source == "allanime":
+            results = scraper.get_popular_anime(page) # page is passed for pagination
         else:
             results = scraper.get_popular_anime()
 
@@ -490,7 +507,7 @@ async def get_popular_anime(
 
 @app.get("/api/anime/latest", response_model=MangaResponse)
 async def get_latest_anime(
-    source: str = Query(..., description="Source to fetch from (hanime,hahomoe)"),
+    source: str = Query(..., description="Source to fetch from (hanime,hahomoe, allanime)"), #added allanime
     page: Optional[int] = Query(1, description="Page number", ge=1),
     limit: Optional[int] = Query(20, description="Results per page", ge=1, le=100)
 ):
@@ -507,6 +524,8 @@ async def get_latest_anime(
         # Get latest anime
         if source == "hahomoe":
             results = scraper.get_latest_anime(page)
+        elif source == "allanime":
+            results = scraper.get_latest_anime(page) # page is passed for pagination
         else:
             results = scraper.get_latest_anime()
 
@@ -537,13 +556,13 @@ async def get_latest_anime(
 
 @app.get("/api/anime/details")
 async def get_anime_details(
-    source: str = Query(..., description="Source to fetch from (hanime, hahomoe)"),
+    source: str = Query(..., description="Source to fetch from (hanime, hahomoe, allanime)"), #added allanime
     id: str = Query(..., description="URL/ID of the anime")
 ):
     """
     Get detailed information about an anime including episodes
 
-    - **source**: Source name (hanime, hahomoe)
+    - **source**: Source name (hanime, hahomoe, allanime) #added allanime
     - **id**: URL/ID of the anime
     """
     start_time = time.time()
@@ -581,13 +600,13 @@ async def get_anime_details(
 
 @app.get("/api/anime/get-episode")
 async def get_anime_episode(
-    source: str = Query(..., description="Source to fetch from (hanime, hahomoe)"),
+    source: str = Query(..., description="Source to fetch from (hanime, hahomoe, allanime)"), #added allanime
     id: str = Query(..., description="URL/ID of the anime episode")
 ):
     """
     Get streaming links for a specific anime episode
 
-    - **source**: Source name (hanime, hahomoe)
+    - **source**: Source name (hanime, hahomoe, allanime) #added allanime
     - **id**: URL/ID of the anime episode
     """
     start_time = time.time()
