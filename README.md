@@ -7,7 +7,7 @@ A FastAPI-based API for fetching anime and manga data from various sources.
 
 This API provides endpoints to search, browse, and fetch detailed information about anime and manga from different sources. Currently supported sources:
 
-- **Anime**: Hanime
+- **Anime**: Hanime, HahoMoe, AllAnime
 - **Manga**: Comick, NHentai
 
 ## API Endpoints

@@ -692,6 +692,9 @@ class AllAnimeScraper:
             'Origin': self.site_url,
             'Referer': f"{self.site_url}/", # Referer should be site_url
         }
+        
+        # Define quality options (similar to Hanime)
+        self.quality_list = ["1080p", "720p", "480p", "360p", "240p"]
 
         # Initialize extractors
         self.all_anime_extractor = AllAnimeExtractor(self.session, self.headers, self.site_url)
@@ -804,14 +807,240 @@ class AllAnimeScraper:
             "On Hiatus": "On Hiatus",
         }
         return status_map.get(status_string, "Unknown") if status_string else "Unknown"
+        
+    def get_filters(self) -> Dict[str, Any]:
+        """Get all available filters for AllAnime."""
+        print("📋 Getting filters for AllAnime...")
+        
+        # Based on AllAnimeFilters.kt
+        filters = {
+            "origin": [
+                {"id": "ALL", "name": "All"},
+                {"id": "JP", "name": "Japan"},
+                {"id": "CN", "name": "China"},
+                {"id": "KR", "name": "Korea"}
+            ],
+            "seasons": [
+                {"id": "all", "name": "All"},
+                {"id": "Winter", "name": "Winter"},
+                {"id": "Spring", "name": "Spring"},
+                {"id": "Summer", "name": "Summer"},
+                {"id": "Fall", "name": "Fall"}
+            ],
+            "years": [
+                {"id": "all", "name": "All"}
+            ] + [{"id": str(year), "name": str(year)} for year in range(2024, 1974, -1)],
+            "sortBy": [
+                {"id": "update", "name": "Update"},
+                {"id": "Name_ASC", "name": "Name Asc"},
+                {"id": "Name_DESC", "name": "Name Desc"},
+                {"id": "Top", "name": "Ratings"}
+            ],
+            "types": [
+                {"id": "Movie", "name": "Movie"},
+                {"id": "ONA", "name": "ONA"},
+                {"id": "OVA", "name": "OVA"},
+                {"id": "Special", "name": "Special"},
+                {"id": "TV", "name": "TV"},
+                {"id": "Unknown", "name": "Unknown"}
+            ],
+            "genres": [
+                {"id": "Action", "name": "Action"},
+                {"id": "Adventure", "name": "Adventure"},
+                {"id": "Cars", "name": "Cars"},
+                {"id": "Comedy", "name": "Comedy"},
+                {"id": "Dementia", "name": "Dementia"},
+                {"id": "Demons", "name": "Demons"},
+                {"id": "Drama", "name": "Drama"},
+                {"id": "Ecchi", "name": "Ecchi"},
+                {"id": "Fantasy", "name": "Fantasy"},
+                {"id": "Game", "name": "Game"},
+                {"id": "Harem", "name": "Harem"},
+                {"id": "Historical", "name": "Historical"},
+                {"id": "Horror", "name": "Horror"},
+                {"id": "Isekai", "name": "Isekai"},
+                {"id": "Josei", "name": "Josei"},
+                {"id": "Kids", "name": "Kids"},
+                {"id": "Magic", "name": "Magic"},
+                {"id": "Martial Arts", "name": "Martial Arts"},
+                {"id": "Mecha", "name": "Mecha"},
+                {"id": "Military", "name": "Military"},
+                {"id": "Music", "name": "Music"},
+                {"id": "Mystery", "name": "Mystery"},
+                {"id": "Parody", "name": "Parody"},
+                {"id": "Police", "name": "Police"},
+                {"id": "Psychological", "name": "Psychological"},
+                {"id": "Romance", "name": "Romance"},
+                {"id": "Samurai", "name": "Samurai"},
+                {"id": "School", "name": "School"},
+                {"id": "Sci-Fi", "name": "Sci-Fi"},
+                {"id": "Seinen", "name": "Seinen"},
+                {"id": "Shoujo", "name": "Shoujo"},
+                {"id": "Shoujo Ai", "name": "Shoujo Ai"},
+                {"id": "Shounen", "name": "Shounen"},
+                {"id": "Shounen Ai", "name": "Shounen Ai"},
+                {"id": "Slice of Life", "name": "Slice of Life"},
+                {"id": "Space", "name": "Space"},
+                {"id": "Sports", "name": "Sports"},
+                {"id": "Super Power", "name": "Super Power"},
+                {"id": "Supernatural", "name": "Supernatural"},
+                {"id": "Thriller", "name": "Thriller"},
+                {"id": "Unknown", "name": "Unknown"},
+                {"id": "Vampire", "name": "Vampire"},
+                {"id": "Yaoi", "name": "Yaoi"},
+                {"id": "Yuri", "name": "Yuri"}
+            ],
+            "quality": self.quality_list
+        }
+        
+        return filters
+        
+    def set_quality(self, quality: str) -> bool:
+        """Set preferred video quality."""
+        if quality in self.quality_list:
+            self.preferences["preferred_quality"] = quality
+            print(f"Quality preference set to: {quality}")
+            return True
+        else:
+            print(f"Invalid quality. Available options: {', '.join(self.quality_list)}")
+            return False
 
     # --- Public Scraper Methods ---
+    
+    def get_popular_anime(self, page=1, max_pages=5) -> List[Dict[str, Any]]:
+        """Get popular anime from AllAnime."""
+        print(f"💫 Getting popular anime from AllAnime...")
+        results = []
+        
+        try:
+            # We'll use the recommendations query which is used for popular anime in the Kotlin implementation
+            data = {
+                "variables": {
+                    "type": "anime",
+                    "size": self.PAGE_SIZE,
+                    "dateRange": 7,
+                    "page": page
+                },
+                "query": "query ($type: RecommendationQueryType, $size: Int, $dateRange: Int, $page: Int) { queryPopular(type: $type, size: $size, dateRange: $dateRange, page: $page) { recommendations { anyCard { _id name englishName nativeName thumbnail slugTime type } } } }"
+            }
+            
+            request = self._build_post_request(data)
+            response = self.session.send(request, timeout=20)
+            
+            if response.status_code == 400:
+                print(f"❌ AllAnime popular anime request failed (400 Bad Request). Payload: {json.dumps(data)}")
+                with open("error.txt", "w") as n: n.write("Payload: " + str(data)); n.write("\nResponse Text:" + str(response.text))
+                print(f"Response Text: {response.text[:500]}")
+                return []
+            
+            response.raise_for_status()
+            
+            response_data = response.json()
+            
+            # Process recommendations format
+            recommendations = response_data.get('data', {}).get('queryPopular', {}).get('recommendations', [])
+            
+            for rec in recommendations:
+                card = rec.get('anyCard')
+                if not card or '_id' not in card:
+                    continue
+                    
+                title = card.get('name', 'Unknown Title')
+                if self._get_preference("preferred_title_style") == "eng":
+                    title = card.get('englishName') or title
+                elif self._get_preference("preferred_title_style") == "native":
+                    title = card.get('nativeName') or title
+                    
+                thumbnail_url = card.get('thumbnail')
+                url = f"{card.get('_id')}<&sep>{card.get('slugTime', '')}<&sep>{self._slugify(card.get('name', ''))}"
+                
+                results.append({
+                    'title': f"{title} [AllAnime]",
+                    'url': url,
+                    'poster': thumbnail_url,
+                    'source': 'allanime',
+                    'type': card.get('type')
+                })
+                
+            print(f"✅ Found {len(results)} popular anime from AllAnime")
+            return results
+            
+        except requests.exceptions.Timeout:
+            print("❌ AllAnime popular anime request timed out.")
+        except requests.exceptions.RequestException as e:
+            print(f"❌ AllAnime popular anime request failed: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"Response status: {e.response.status_code}")
+                print(f"Response body: {e.response.text[:500]}")
+        except json.JSONDecodeError:
+            print("❌ Failed to parse JSON response from AllAnime popular anime request.")
+        except Exception as e:
+            import traceback
+            print(f"An unexpected error occurred during AllAnime popular anime request: {e}")
+            print(traceback.format_exc())
+            
+        return results
+    
+    def get_latest_anime(self, page=1, max_pages=5) -> List[Dict[str, Any]]:
+        """Get latest anime from AllAnime."""
+        print(f"🆕 Getting latest anime from AllAnime...")
+        results = []
+        
+        try:
+            # For latest anime, we'll use the search API with a specific sort 
+            data = {
+                "variables": {
+                    "search": {
+                        "allowAdult": False,
+                        "allowUnknown": False,
+                        "sortBy": "update"  # Sort by latest updates
+                    },
+                    "limit": self.PAGE_SIZE,
+                    "page": page,
+                    "translationType": self._get_preference("preferred_sub"),
+                    "countryOrigin": "ALL"
+                },
+                "query": self.SEARCH_QUERY
+            }
+            
+            request = self._build_post_request(data)
+            response = self.session.send(request, timeout=20)
+            
+            if response.status_code == 400:
+                print(f"❌ AllAnime latest anime request failed (400 Bad Request). Payload: {json.dumps(data)}")
+                with open("error.txt", "w") as n: n.write("Payload: " + str(data)); n.write("\nResponse Text:" + str(response.text))
+                print(f"Response Text: {response.text[:500]}")
+                return []
+                
+            response.raise_for_status()
+            
+            response_data = response.json()
+            results = self._parse_anime(response_data)
+            
+            print(f"✅ Found {len(results)} latest anime from AllAnime")
+            return results
+            
+        except requests.exceptions.Timeout:
+            print("❌ AllAnime latest anime request timed out.")
+        except requests.exceptions.RequestException as e:
+            print(f"❌ AllAnime latest anime request failed: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"Response status: {e.response.status_code}")
+                print(f"Response body: {e.response.text[:500]}")
+        except json.JSONDecodeError:
+            print("❌ Failed to parse JSON response from AllAnime latest anime request.")
+        except Exception as e:
+            import traceback
+            print(f"An unexpected error occurred during AllAnime latest anime request: {e}")
+            print(traceback.format_exc())
+            
+        return results
 
-    def search_anime(self, query: str, filters: Optional[FilterSearchParams] = None) -> List[Dict[str, Any]]:
+    def search_anime(self, query: str, filters: Optional[FilterSearchParams] = None, page=1, max_pages=5) -> List[Dict[str, Any]]:
         """Search for anime on AllAnime by title or filters."""
         print(f"🔍 Searching for '{query}' on AllAnime...")
         results = []
-        page = 1
+        current_page = page
         # Pagination is handled by the API returning results until empty, not explicit page limit needed here.
 
         try:
@@ -838,29 +1067,42 @@ class AllAnimeScraper:
                 #     # ... add other filters (genres, types, year, sortBy)
                 pass # Proceed with default search if no query and filters not implemented
 
-            data = {
-                "variables": variables,
-                "query": self.SEARCH_QUERY
-            }
+            # Fetch multiple pages if requested
+            while current_page <= max_pages:
+                variables["page"] = current_page
+                
+                data = {
+                    "variables": variables,
+                    "query": self.SEARCH_QUERY
+                }
 
-            request = self._build_post_request(data)
-            response = self.session.send(request, timeout=20) # Add timeout
+                request = self._build_post_request(data)
+                response = self.session.send(request, timeout=20) # Add timeout
 
-            if response.status_code == 400:
-                 print(f"❌ AllAnime search failed (400 Bad Request). Payload: {json.dumps(data)}")
-                 with open("error.txt", "w") as n: n.write("Payload: " + str(data)); n.write("\nRespone Text:" + str(response.text))
-                 print(f"Response Text: {response.text[:500]}")
-                 #n.write(str(response.text)) # Print beginning of error response
-                 return []
-            response.raise_for_status() # Raise an exception for other bad status codes
+                if response.status_code == 400:
+                     print(f"❌ AllAnime search failed (400 Bad Request). Payload: {json.dumps(data)}")
+                     with open("error.txt", "w") as n: n.write("Payload: " + str(data)); n.write("\nRespone Text:" + str(response.text))
+                     print(f"Response Text: {response.text[:500]}")
+                     break
+                
+                response.raise_for_status() # Raise an exception for other bad status codes
 
-            response_data = response.json()
-            page_results = self._parse_anime(response_data)
-            results.extend(page_results)
-
-            # Note: AllAnime API doesn't seem to have explicit pagination info in search response.
-            # The Kotlin code checks if results == PAGE_SIZE. We'll assume one page for CLI simplicity for now.
-            # If pagination is needed, the API structure might require a different approach.
+                response_data = response.json()
+                page_results = self._parse_anime(response_data)
+                
+                if not page_results:
+                    # No more results
+                    break
+                    
+                results.extend(page_results)
+                print(f"Found {len(page_results)} results on page {current_page}. Total: {len(results)}")
+                
+                # Check if we can continue for more pages
+                if len(page_results) < self.PAGE_SIZE:
+                    # Less than a full page, assume no more results
+                    break
+                    
+                current_page += 1
 
         except requests.exceptions.Timeout:
             print("❌ AllAnime search request timed out.")
@@ -1334,6 +1576,25 @@ class AllAnimeScraper:
                 quality_score = 0
                 if quality_pref in quality:
                     quality_score = 1 # Higher score if preferred quality matches
+                    
+                # Enhanced quality scoring based on resolution
+                resolution_score = 0
+                # Extract resolution from quality string
+                resolution_match = re.search(r'(\d+)p', quality)
+                if resolution_match:
+                    res_value = int(resolution_match.group(1))
+                    # Map common resolutions to scores (higher is better)
+                    resolution_map = {
+                        2160: 5,  # 4K
+                        1440: 4,  # 2K
+                        1080: 3,  # 1080p
+                        720: 2,   # 720p
+                        480: 1,   # 480p
+                        360: 0,   # 360p
+                        240: -1,  # 240p
+                        144: -2   # 144p
+                    }
+                    resolution_score = resolution_map.get(res_value, 0)
 
                 # Score based on sub/dub preference (simple check in quality name)
                 sub_dub_score = 0
@@ -1341,7 +1602,7 @@ class AllAnimeScraper:
                     sub_dub_score = 1
 
                 # Return tuple for sorting (higher scores first)
-                return (server_score, quality_score, sub_dub_score)
+                return (server_score, quality_score, resolution_score, sub_dub_score)
 
             sorted_video_tuples = sorted(extracted_video_list, key=sort_key, reverse=True)
             video_sources = [v[0] for v in sorted_video_tuples] # Extract only the video dicts

@@ -29,6 +29,7 @@ app.add_middleware(
 comick_scraper = ComickScraper()
 nhentai_scraper = NHentaiScraper()
 hanime_scraper = HanimeScraper()
+allanime_scraper = AllAnimeScraper()
 
 # Dictionary to store scrapers by name
 scrapers = {
@@ -40,7 +41,8 @@ scrapers = {
 # Dictionary to store anime scrapers by name
 anime_scrapers = {
     "hanime": hanime_scraper,
-    "hahomoe": HahoMoeSearcher()
+    "hahomoe": HahoMoeSearcher(),
+    "allanime": allanime_scraper
 }
 
 class MangaResponse(BaseModel):
@@ -158,6 +160,9 @@ async def get_filters(
                 "sorts": [{"title": sort[0], "value": sort[1]} for sort in hahomoe_scraper.get_sortable_list()],
                 "quality": hahomoe_scraper.quality_list
             }
+        elif source == "allanime":
+            allanime_scraper = anime_scrapers["allanime"]
+            filters = allanime_scraper.get_filters()
         else:
             raise HTTPException(status_code=400, detail=f"Filters not available for source: {source}")
 
