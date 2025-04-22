@@ -1317,9 +1317,14 @@ class AllAnimeScraper:
 
     def get_video_sources(self, episode_url_payload: str) -> List[Dict[str, Any]]:
         """Get video sources for an episode (like Kotlin's getVideoList)."""
+        import concurrent.futures
+        from threading import Lock
+        
         print(f"🎥 Extracting video sources from AllAnime episode...")
         video_sources = []
         server_list: List[Tuple[Dict[str, Any], float]] = [] # Store as (server_info, priority)
+        extracted_video_list: List[Tuple[Dict[str, Any], float]] = [] # Store as (video_dict, priority)
+        extracted_video_list_lock = Lock()  # Lock for thread-safe appending to extracted_video_list
 
         try:
             # Log start of extraction to error.txt for debugging
@@ -1482,73 +1487,91 @@ class AllAnimeScraper:
                 for i, (server, priority) in enumerate(temp_server_list):
                     f.write(f"Server {i+1}: {server['name']} (priority: {priority})\n")
 
-            # --- Extract Videos from Selected Servers ---
-            extracted_video_list: List[Tuple[Dict[str, Any], float]] = [] # Store as (video_dict, priority)
-
-            for server_info, priority in temp_server_list:
+            # --- Extract Videos from Selected Servers using thread pool ---
+            def extract_videos_from_server(server_tuple):
+                server_info, priority = server_tuple
                 s_name = server_info['name']
                 s_url = server_info['url']
-                s_raw_name = server_info['raw_name'] # Original name for internal extractor
-
-                with open('error.txt', 'a', encoding='utf-8') as f:
-                    f.write(f"\nExtracting videos from: {s_name} ({s_url})\n")
+                s_raw_name = server_info['raw_name']  # Original name for internal extractor
+                local_videos = []
 
                 try:
-                    videos = []
+                    with open('error.txt', 'a', encoding='utf-8') as f:
+                        f.write(f"\n[Thread] Extracting videos from: {s_name} ({s_url})\n")
+
                     if s_name.startswith("internal "):
-                        videos = self.all_anime_extractor.videoFromUrl(s_url, s_raw_name)
+                        local_videos = self.all_anime_extractor.videoFromUrl(s_url, s_raw_name)
                     elif s_name.startswith("player@"):
                         print(f"Player type extraction not implemented for: {s_url}")
                         with open('error.txt', 'a', encoding='utf-8') as f:
                             f.write(f"Player type extraction not implemented\n")
                     elif s_name == "vidstreaming":
-                        videos = self.gogo_stream_extractor.videosFromUrl(s_url.replace("//", "https://"))
+                        local_videos = self.gogo_stream_extractor.videosFromUrl(s_url.replace("//", "https://"))
                     elif s_name == "doodstream":
-                        videos = self.dood_extractor.videosFromUrl(s_url)
+                        local_videos = self.dood_extractor.videosFromUrl(s_url)
                     elif s_name == "okru":
-                        videos = self.okru_extractor.videosFromUrl(s_url)
+                        local_videos = self.okru_extractor.videosFromUrl(s_url)
                     elif s_name == "mp4upload":
-                        videos = self.mp4upload_extractor.videosFromUrl(s_url, self.headers)
+                        local_videos = self.mp4upload_extractor.videosFromUrl(s_url, self.headers)
                     elif s_name == "streamlare":
-                        videos = self.streamlare_extractor.videosFromUrl(s_url)
+                        local_videos = self.streamlare_extractor.videosFromUrl(s_url)
                     elif s_name == "filemoon":
-                        videos = self.filemoon_extractor.videosFromUrl(s_url, prefix="Filemoon:")
+                        local_videos = self.filemoon_extractor.videosFromUrl(s_url, prefix="Filemoon:")
                     elif s_name == "streamwish":
-                        videos = self.streamwish_extractor.videosFromUrl(s_url, videoNameGen=lambda q: f"StreamWish:{q}")
+                        local_videos = self.streamwish_extractor.videosFromUrl(s_url, videoNameGen=lambda q: f"StreamWish:{q}")
 
                     with open('error.txt', 'a', encoding='utf-8') as f:
-                        f.write(f"Extracted {len(videos)} videos\n")
-                        
-                    # Add extracted videos with their server priority
-                    for video in videos:
-                        # Ensure video is a dict before adding source and priority
+                        f.write(f"[Thread] Extracted {len(local_videos)} videos from {s_name}\n")
+                    
+                    video_tuples = []
+                    # Process videos from this server
+                    for video in local_videos:
                         if isinstance(video, dict):
-                            video['source'] = 'allanime' # Add source identifier
-                            extracted_video_list.append((video, priority))
-                            with open('error.txt', 'a', encoding='utf-8') as f:
-                                f.write(f"  Added video: {video.get('quality', 'Unknown')}\n")
-                        elif hasattr(video, 'videoUrl') and hasattr(video, 'videoTitle'): # Handle Video object from placeholders
-                             video_dict = {
-                                 'url': video.videoUrl,
-                                 'quality': video.videoTitle,
-                                 'headers': video.headers,
-                                 'source': 'allanime',
-                                 'subtitles': [{'url': sub.url, 'language': sub.lang} for sub in getattr(video, 'subtitleTracks', [])]
-                             }
-                             extracted_video_list.append((video_dict, priority))
-                             with open('error.txt', 'a', encoding='utf-8') as f:
-                                 f.write(f"  Added video object: {video.videoTitle}\n")
-
+                            video['source'] = 'allanime'  # Add source identifier
+                            video_tuples.append((video, priority))
+                        elif hasattr(video, 'videoUrl') and hasattr(video, 'videoTitle'):  # Handle Video object from placeholders
+                            video_dict = {
+                                'url': video.videoUrl,
+                                'quality': video.videoTitle,
+                                'headers': video.headers,
+                                'source': 'allanime',
+                                'subtitles': [{'url': sub.url, 'language': sub.lang} for sub in getattr(video, 'subtitleTracks', [])]
+                            }
+                            video_tuples.append((video_dict, priority))
+                    
+                    # Add to shared list with lock protection
+                    with extracted_video_list_lock:
+                        extracted_video_list.extend(video_tuples)
+                        
+                    return len(video_tuples)
+                    
                 except Exception as e:
                     print(f"Error extracting videos from server {s_name} ({s_url}): {e}")
                     import traceback
                     trace = traceback.format_exc()
                     print(trace)
                     with open('error.txt', 'a', encoding='utf-8') as f:
-                        f.write(f"Error extracting videos: {e}\n")
+                        f.write(f"[Thread] Error extracting videos: {e}\n")
                         f.write(f"{trace}\n")
-                    continue
+                    return 0
+            
+            # Process servers in parallel using ThreadPoolExecutor with max 3 workers
+            print(f"⏳ Starting parallel extraction of {len(temp_server_list)} servers with max 3 workers...")
+            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+                # Submit all tasks
+                future_to_server = {executor.submit(extract_videos_from_server, server_tuple): server_tuple for server_tuple in temp_server_list}
+                
+                # Process results as they complete
+                for future in concurrent.futures.as_completed(future_to_server):
+                    server_tuple = future_to_server[future]
+                    server_name = server_tuple[0]['name']
+                    try:
+                        count = future.result()
+                        print(f"✅ Extracted {count} videos from {server_name}")
+                    except Exception as e:
+                        print(f"❌ Server {server_name} generated an exception: {e}")
 
+            print(f"🔄 Parallel extraction complete. Processing {len(extracted_video_list)} videos...")
             with open('error.txt', 'a', encoding='utf-8') as f:
                 f.write(f"\nExtracted {len(extracted_video_list)} total videos\n")
 
